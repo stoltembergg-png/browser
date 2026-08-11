@@ -34,6 +34,7 @@ present:
   - docs/development/WAVE-001.md
   - docs/development/github-issue-map.json
   - docs/development/github-pr-map.json
+  - docs/development/STATE_SYNC.md
   - CONTRIBUTING.md
   - SECURITY.md
   - CODE_OF_CONDUCT.md

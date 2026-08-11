@@ -47,6 +47,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 28. [docs/development/WAVE-001.md](docs/development/WAVE-001.md) — primeira wave e evidence mapping.
 29. [docs/development/github-issue-map.json](docs/development/github-issue-map.json) — IDs estáveis para Issues GitHub.
 30. [docs/development/github-pr-map.json](docs/development/github-pr-map.json) — IDs estáveis para Draft PRs, branches e SHAs.
+31. [docs/development/STATE_SYNC.md](docs/development/STATE_SYNC.md) — estratégia de snapshot/derivação de estado a partir do GitHub.
 
 ## Ordem de leitura
 
