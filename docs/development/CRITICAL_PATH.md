@@ -1,0 +1,75 @@
+# Critical Path — caminho crítico até o primeiro navegador funcional
+
+## Autoridade
+
+Este documento é uma visão operacional derivada de `ROADMAP.md`, `PR_PLAN.md` e `docs/pr-dag.yaml`. Os IDs abaixo são IDs estáveis do plano, não números do GitHub. O caminho só é comprovado quando cada predecessor tem Issue/PR, dependências resolvidas e evidência no SHA atual.
+
+## Spine de governança e quality gate
+
+```text
+PR-001 Repository governance
+  → PR-002 ADR/spec templates
+  → PR-003 PR/CODEOWNERS/policy contracts
+  → PR-006 CI trust baseline
+  → PR-007 format/lint/docs gate
+  → PR-010 Quality Gate aggregator
+```
+
+Este spine é pré-requisito para tratar qualquer Draft PR como executável. `PR-008` e `PR-009` são paralelos a `PR-007` depois de `PR-005`, mas todos convergem em `PR-010`.
+
+## Spine técnico até MVP
+
+```text
+PR-001/002/003
+  → PR-004 workspace
+  → PR-005 toolchain/dependencies
+  → PR-007 quality gate
+  → PR-011 Tauri shell
+  → PR-013 Servo embedding spike
+  → PR-014 render surface spike
+  → PR-015 provisional engine contract/fake
+  → PR-019 domain IDs
+  → PR-020 browser-core actor/lifecycle
+  → PR-022 navigation state machine
+  → PR-024 typed Tauri IPC
+  → PR-025 fake-engine vertical slice
+  → PR-026 real Servo/surface thin integration
+  → PR-027 navigation controls/error UX
+  → PR-029 reference-platform MVP smoke
+```
+
+A integração real não pode iniciar antes de `PR-013`, `PR-014` e `PR-015` produzirem evidência. O fake engine não substitui `PR-026`.
+
+## Predecessores paralelos que convergem no MVP
+
+- `PR-006`, `PR-008` e `PR-009`: trust, dependency/security e architecture gates.
+- `PR-016` e `PR-017`: Servo pinned smoke e matriz de OS.
+- `PR-021` e `PR-023`: envelopes e lifecycle do engine host.
+- `PR-028`: crash/restart policy antes de `PR-029`.
+- `PR-018`: package/release skeleton, sem publicação.
+
+Paralelismo só é permitido quando não há contrato compartilhado, migration/schema owner, engine revision, workflow trust root ou estado divergente.
+
+## Caminho pós-MVP
+
+```text
+PR-029
+  → PR-030..041 browser state/persistence
+  → PR-042..048 security/privacy/threat regression
+  → PR-049..056 WPT/platform/performance/stress
+  → PR-057..060 diagnostics/release/update
+  → PR-061/062 Alpha/Beta gates
+  → PR-064..070 isolation/process/recovery
+  → PR-063 Stable gate (M8)
+```
+
+`PR-063` é M8 porque depende da prova de isolamento e dos drills `PR-064`–`PR-070`; M7 prepara Alpha/Beta, não libera Stable.
+
+## Blockers do caminho crítico
+
+- ADRs de Servo, engine contract, concorrência, storage, IPC e process model ainda não ratificadas;
+- superfície Tauri↔Servo não comprovada;
+- storage/profile schema e HTTP/TLS policy ainda abertos;
+- boundary entre página hostil e UI privilegiada exige fixture/negative IPC;
+- CI/Rulesets/required checks reais ainda não verificados no GitHub;
+- engine host separado e evidência adversarial por OS bloqueiam Stable.

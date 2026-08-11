@@ -1,0 +1,85 @@
+schema_version: 1
+status: proposed
+source_of_truth: DOCUMENTATION_PLAN.md
+validation_command: xtask documentation-check
+
+present:
+  - README.md
+  - AGENTS.md
+  - PROJECT_PLAN.md
+  - ARCHITECTURE.md
+  - ROADMAP.md
+  - PR_PLAN.md
+  - CI_CD_STRATEGY.md
+  - TESTING_STRATEGY.md
+  - SECURITY_MODEL.md
+  - THREAT_MODEL.md
+  - RELEASE_STRATEGY.md
+  - AI_AGENT_GOVERNANCE.md
+  - DOCUMENTATION_PLAN.md
+  - SOURCES.md
+  - docs/decisions/README.md
+  - docs/decisions/ADR-000-template.md
+  - docs/architecture-graph.yaml
+  - docs/document-authority.yaml
+  - docs/gates/release-gates.yaml
+  - docs/contracts/runtime-lifecycle.md
+  - docs/contracts/runtime-manifest.yaml
+  - docs/contracts/engine-contract-manifest.yaml
+  - docs/ci/control-plane-runbook.md
+  - docs/pr-dag.yaml
+  - CURRENT_STATE.md
+  - docs/development/CRITICAL_PATH.md
+  - docs/development/EXECUTION_MAP.md
+
+planned:
+  - path: CONTRIBUTING.md
+    owner_pr: PR-001/003
+  - path: SECURITY.md
+    owner_pr: PR-001/048
+  - path: DEVELOPMENT.md
+    owner_pr: PR-004/005
+  - path: TESTING.md
+    owner_pr: PR-007/049
+  - path: RELEASING.md
+    owner_pr: PR-018/059
+  - path: DEPENDENCIES.md
+    owner_pr: PR-005/008
+  - path: CHANGELOG.md
+    owner_pr: release-process
+  - path: docs/decisions/ADR-001.md
+    owner_pr: PR-013/014
+  - path: docs/decisions/ADR-002.md
+    owner_pr: PR-014
+  - path: docs/decisions/ADR-003.md
+    owner_pr: PR-013/014/016
+  - path: docs/decisions/ADR-004.md
+    owner_pr: PR-015/026
+  - path: docs/decisions/ADR-005.md
+    owner_pr: PR-020/023
+  - path: docs/decisions/ADR-006.md
+    owner_pr: PR-035/037
+  - path: docs/decisions/ADR-007.md
+    owner_pr: PR-021/024/045
+  - path: docs/decisions/ADR-008.md
+    owner_pr: PR-064/065/066/069/070
+  - path: docs/decisions/ADR-009.md
+    owner_pr: PR-059/060
+
+adr_policy:
+  accepted_required_before_authority: true
+  proposed_may_describe_option: true
+  proposed_may_not_satisfy_gate: true
+  supersession_must_preserve_history: true
+
+reference_policy:
+  missing_document_reference: fail
+  duplicate_authority: fail
+  stale_status_or_owner: fail
+  unresolved_adr_dependency: fail
+
+agent_policy:
+  memories_file_in_repo: forbidden
+  soul_file_in_repo: forbidden
+  bot_in_codeowners: forbidden
+  bot_as_required_reviewer: forbidden

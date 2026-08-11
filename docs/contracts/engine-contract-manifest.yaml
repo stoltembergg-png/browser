@@ -1,0 +1,47 @@
+schema_version: 1
+status: proposed
+authority: ADR-004
+source_of_truth: TESTING_STRATEGY.md
+validation_command: xtask engine-contract-check
+validated_against_runtime: false
+
+adapters:
+  required: [fake-engine, servo-engine]
+  same_cases_required: true
+  servo_revision_required: true
+
+contract_subset:
+  lifecycle: [create, ready, close, shutdown]
+  navigation: [started, committed, failed, cancelled, stale]
+  rendering: [frame_ready, paint, present, resize]
+  input: [pointer, keyboard, text]
+  control: [timeout, cancellation, queue_saturation, reliable_control_admission]
+  recovery: [crash, restart, stale_event, generation_fence]
+  negotiation: [unknown_version_rejection, unsupported_command_rejection, capability_subset]
+
+non_vacuity:
+  required_observations: [adapter_loaded, command_sent, event_received, frame_observed, input_observed, shutdown_observed]
+  empty_log: NO_GO
+  no_frame: NO_GO
+  no_run: NO_GO
+  skipped_case: NO_GO
+  missing_fixture: NO_GO
+
+result_statuses: [pass, fail, skip, no-run]
+
+identity:
+  required_fields: [repository, commit_sha, tree_sha, engine_revision, os_and_arch, surface_strategy, thread_affinity, artifact_digest]
+  stale_or_mismatched: NO_GO
+
+unknowns:
+  unknown_command: typed_rejection
+  unknown_event: typed_rejection
+  unknown_version: typed_rejection
+  silent_fallback: NO_GO
+
+artifacts:
+  per_adapter: true
+  per_os: true
+  event_log_required: true
+  contract_case_manifest_required: true
+  missing_artifact: NO_GO

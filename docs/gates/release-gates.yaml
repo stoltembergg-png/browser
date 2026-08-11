@@ -1,0 +1,195 @@
+schema_version: 1
+status: proposed
+source_of_truth: PROJECT_PLAN.md
+validation_command: xtask release-gate-check
+operational_state: UNVERIFIED
+automatic_merge: NO_GO
+automatic_release: NO_GO
+
+control_plane:
+  states: [UNVERIFIED, 'OFF', 'SHADOW', 'ENFORCED']
+  initial_state: UNVERIFIED
+  transitions:
+    UNVERIFIED: ['OFF']
+    'OFF': ['SHADOW']
+    'SHADOW': ['OFF', 'ENFORCED']
+    'ENFORCED': ['OFF', 'SHADOW']
+  stale_or_missing_snapshot: UNVERIFIED
+  unverified_is_fail_closed: true
+  enforced_requires:
+    - authenticated_ruleset_snapshot
+    - stable_required_check_identity
+    - current_negative_canaries
+    - protected_evaluator_revision
+
+release_gate_enforcement:
+  executable_checker_required: true
+  protected_release_workflow_required: true
+  proposed_or_missing_checker: NO_GO
+  in_process_only_engine: NO_GO
+
+stable_process_evidence:
+  status: required_before_stable
+  required_per_os_tuple:
+    - os_and_arch
+    - browser_process_identity
+    - engine_child_process_identity
+    - parent_child_relation
+    - engine_binary_digest
+    - engine_revision
+    - launch_restrictions
+    - kill_restart_result
+    - cross_origin_compromise_result
+    - renderer_recovery_result
+    - browser_artifact_digest
+    - browser_commit_sha
+    - captured_at
+    - evidence_digest
+  forbidden_substitutions:
+    - thread_id_only
+    - actor_id_only
+    - in_process_engine_instance
+    - undocumented_manual_observation
+  missing_or_mismatched: NO_GO
+
+release_artifact_evidence:
+  required_identity:
+    - repository
+    - ref
+    - commit_sha
+    - tested_tree
+    - workflow_path_and_revision
+    - run_id_and_attempt
+    - artifact_digest
+    - signer_identity
+    - sbom_digest
+    - attestation_digest
+  reject:
+    - missing
+    - stale
+    - wrong_repository
+    - wrong_ref
+    - wrong_workflow
+    - wrong_signer
+    - digest_mismatch
+    - substituted_artifact
+
+break_glass:
+  allowed_actions:
+    - disable_auto_merge
+    - disable_merge_queue
+    - freeze_release_or_update
+    - restore_last_known_good_policy
+    - invalidate_evidence
+    - return_to_shadow
+  forbidden_actions:
+    - publish_stable
+    - bypass_required_check
+    - approve_missing_engine_process
+    - approve_missing_signature
+    - approve_missing_provenance
+  dual_control_required: true
+  immutable_audit_required: true
+  expiry_and_revocation_required: true
+
+common:
+  missing_evidence: NO_GO
+  stale_evidence: NO_GO
+  wrong_sha_or_tree: NO_GO
+  skipped_required_case: NO_GO
+  untriaged_failure: NO_GO
+  proposed_adr_used_as_authority: NO_GO
+  invalid_artifact_attestation: NO_GO
+  exception_requires:
+    - owner
+    - written_reason
+    - affected_scope
+    - mitigation
+    - expiry
+    - revocation_condition
+  exception_never_allows:
+    - unknown_security_claim
+    - unsigned_artifact
+    - unverifiable_provenance
+    - absent_engine_surface_evidence
+
+MVP:
+  status: experimental
+  platform_scope: reference_platform_only_for_real_surface
+  other_platforms: build_or_feasibility_only
+  required:
+    - local_privileged_ui
+    - fake_engine_contract
+    - pinned_servo_surface_spike
+    - reference_platform_navigation
+    - input_resize_frame
+    - explicit_crash_state
+    - privileged_ui_boundary_fixture_and_negative_ipc
+    - capability_csp_policy_lint
+  forbidden_claims:
+    - production_browser
+    - sandbox
+    - site_isolation
+    - supported_all_platforms
+
+Alpha:
+  status: signed_pre_release
+  depends_on: [M0, M1, M2, M3, M4, M5, M6]
+  required:
+    - tabs_sessions_profiles_history_bookmarks_downloads_permissions
+    - security_regression_suite
+    - tm_009_privileged_ui_boundary
+    - pinned_wpt_subset_and_triage
+    - reference_and_secondary_platform_evidence
+    - signed_artifact_sbom_provenance
+    - artifact_attestation_identity_verified
+    - known_risk_register
+  forbidden_claims:
+    - stable_security_boundary
+    - complete_web_compatibility
+
+Beta:
+  status: release_candidate
+  depends_on: [Alpha]
+  required:
+    - platform_support_matrix
+    - performance_adr_and_regression_gate
+    - stress_soak_and_recovery
+    - verified_updater_canary
+    - profile_migration_recovery
+    - threat_model_review
+    - support_runbooks
+  forbidden_claims:
+    - production_browser
+    - sandbox
+    - site_isolation
+    - secure_renderer
+    - supported_all_platforms
+    - complete_web_compatibility
+
+Stable:
+  status: public_release
+  depends_on: [Beta, M8_isolation]
+  required:
+    - engine_host_production_rollout
+    - engine_host_separate_process
+    - process_launch_restrictions_by_os
+    - cross_origin_compromise_scenario
+    - renderer_crash_recovery
+    - signed_artifacts_sbom_provenance
+    - artifact_attestation_identity_verified
+    - update_key_rotation_and_last_known_good
+    - performance_adr_and_gate
+    - wpt_expectations_with_no_untriaged_security_failures
+    - supported_os_tuple_matrix
+    - profile_migration_and_data_loss_recovery
+    - extension_and_devtools_scope_decision
+  forbidden_claims:
+    - sandbox_without_process_evidence
+    - site_isolation_without_process_evidence
+    - secure_renderer_without_engine_matrix
+  no_exception_for:
+    - missing_separate_engine_process
+    - missing_signature
+    - missing_provenance
+    - untriaged_critical_security_failure

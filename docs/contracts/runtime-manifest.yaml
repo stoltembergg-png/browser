@@ -1,0 +1,73 @@
+schema_version: 1
+status: proposed
+authority: ADR-005
+source_of_truth: docs/contracts/runtime-lifecycle.md
+validation_command: xtask runtime-manifest-check
+validated_against_runtime: false
+
+# Este manifest é um contrato de planejamento. Valores numéricos só podem ser
+# ratificados após o spike/runner produzir baseline e evidência de saturação.
+queues:
+  realtime_coalescible:
+    examples: [input, resize, frame_hint]
+    delivery: bounded_latest_wins
+    silent_drop: forbidden
+    metrics_required: true
+  reliable_control:
+    examples: [navigate, stop, close, permission, download_decision]
+    delivery: lossless_or_admission_reject
+    silent_drop: forbidden
+    ack_required: true
+  diagnostics:
+    examples: [tracing, auxiliary_progress]
+    delivery: bounded_best_effort
+    drop_allowed_with_counter: true
+
+wake_policy:
+  servo_waker_owner: engine_host_thread
+  spin_event_loop_owner: engine_host_thread
+  coalescing_allowed: true
+  wake_after_drop: stale_and_ignored
+  fairness_required: true
+
+admission:
+  queue_full_result: explicit_queue_saturated_error
+  reliable_control_reservation_required: true
+  starvation: NO_GO
+  unbounded_growth: NO_GO
+  arbitrary_capacity_without_baseline: NO_GO
+
+cancellation:
+  scopes: [app, session, profile, tab, navigation, request]
+  terminal_result_required: true
+  late_completion: stale_or_already_resolved
+  side_effect_after_cancel: forbidden_after_commit_reservation
+  timeout_is_terminal: true
+
+fencing:
+  tuple: [engine_instance_id, tab_id, webview_id, navigation_id, request_id, epoch]
+  linearization_owner: browser_core_single_writer_reducer
+  old_epoch_event: StaleContext
+  duplicate_resolution: AlreadyResolved
+  external_effect_requires_current_fence: true
+
+shutdown:
+  phases: [quiesce, reject_new_mutations, drain_reliable_control, cancel_realtime, snapshot, destroy_surface, stop_engine, close_repositories, closed]
+  callback_after_drop: forbidden
+  pending_frame_after_close: StaleContext
+  join_timeout: blocking_diagnostic
+  deadlock_watchdog_required: true
+
+required_evidence:
+  items:
+    - transition_matrix
+    - queue_saturation_and_admission_tests
+    - cancellation_completion_interleavings
+    - shutdown_barrier_trace
+    - crash_recovery_side_effect_matrix
+    - fake_and_real_contract_manifest_result
+    - repository_head_tree_sha
+    - engine_revision
+    - os_and_arch
+    - artifact_digest
+  missing_or_stale: NO_GO

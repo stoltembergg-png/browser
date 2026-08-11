@@ -1,0 +1,737 @@
+schema_version: 1
+status: proposed
+source_of_truth: PR_PLAN.md
+generated_from_summary_table: true
+validation_command: xtask pr-dag-check
+
+rules:
+  one_logical_change_per_pr: true
+  dependency_is_contract: true
+  dependency_evidence_must_be_current: true
+  stale_dependency_evidence: fail
+  combined_tree_validation_required_for:
+    - engine-api
+    - ui-schema
+    - storage-schema-and-migrations
+    - architecture-graph
+    - workflows-and-rulesets
+    - CODEOWNERS
+    - release-manifest
+  rebase_or_base_change_invalidates_downstream: true
+  proposed_authority_gate: fail
+  authority_gates:
+    ADR-003:
+      required_before: [PR-016, PR-026]
+      required_artifacts: [docs/decisions/ADR-003.md, docs/contracts/engine-contract-manifest.yaml]
+      accepted_status: accepted_only
+      evidence: [servo_revision_pin, surface_strategy, thread_event_loop_model, real_smoke_artifact]
+    ADR-004:
+      required_before: [PR-020, PR-021, PR-025, PR-026]
+      required_artifacts: [docs/decisions/ADR-004.md, docs/contracts/engine-contract-manifest.yaml]
+      accepted_status: accepted_only
+      evidence: [engine_contract_revision, shared_fake_real_manifest, unknown_rejection_cases]
+    ADR-005:
+      required_before: [PR-020, PR-023, PR-025, PR-028, PR-029]
+      required_artifacts: [docs/decisions/ADR-005.md, docs/contracts/runtime-lifecycle.md, docs/contracts/runtime-manifest.yaml]
+      accepted_status: accepted_only
+      evidence: [runtime_manifest, bounded_queue_policy, fairness, reliable_control_admission, fencing, shutdown_barrier]
+    runtime-lifecycle-contract:
+      required_before: [PR-020, PR-023, PR-025, PR-026, PR-028, PR-029]
+      required_artifacts: [docs/contracts/runtime-lifecycle.md, docs/contracts/runtime-manifest.yaml]
+      accepted_status: accepted_only
+      evidence: [transition_matrix, linearization_rule, interleaving_artifacts, recovery_matrix]
+    engine-contract-manifest:
+      required_before: [PR-015, PR-016, PR-026]
+      required_artifacts: [docs/contracts/engine-contract-manifest.yaml]
+      accepted_status: accepted_only
+      evidence: [fake_adapter_result, servo_adapter_result, non_vacuity, artifact_identity]
+  authority_gate_binding:
+    required_fields: [repository, commit_sha, tree_sha, artifact_digest]
+    combined_tree_validation: true
+    missing_stale_or_mismatched: NO_GO
+  authority_gate_failure: NO_GO
+
+nodes:
+  - id: PR-001
+    title: 'Repository governance'
+    milestone: 'M0'
+    dependencies:
+      []
+    parallel: false
+    risk: 'baixo'
+    result: 'identidade e regras'
+  - id: PR-002
+    title: 'ADR/document templates'
+    milestone: 'M0'
+    dependencies:
+      - PR-001
+    parallel: true
+    risk: 'baixo'
+    result: 'decisões rastreáveis'
+  - id: PR-003
+    title: 'PR/CODEOWNERS policy'
+    milestone: 'M0'
+    dependencies:
+      - PR-001
+      - PR-002
+    parallel: true
+    risk: 'médio'
+    result: 'contribuição controlada'
+  - id: PR-004
+    title: 'Rust workspace skeleton'
+    milestone: 'M0'
+    dependencies:
+      - PR-001
+    parallel: true
+    risk: 'baixo'
+    result: 'workspace real'
+  - id: PR-005
+    title: 'Toolchain/dependency policy'
+    milestone: 'M0'
+    dependencies:
+      - PR-004
+    parallel: true
+    risk: 'médio'
+    result: 'builds determinísticos'
+  - id: PR-006
+    title: 'CI trust baseline'
+    milestone: 'M0'
+    dependencies:
+      - PR-003
+      - PR-004
+      - PR-005
+    parallel: false
+    risk: 'alto'
+    result: 'workflows least privilege'
+  - id: PR-007
+    title: 'format/lint/docs gate'
+    milestone: 'M0'
+    dependencies:
+      - PR-005
+      - PR-006
+    parallel: true
+    risk: 'baixo'
+    result: 'static gate'
+  - id: PR-008
+    title: 'dependency/security gate'
+    milestone: 'M0'
+    dependencies:
+      - PR-005
+      - PR-006
+    parallel: true
+    risk: 'alto'
+    result: 'supply-chain gate'
+  - id: PR-009
+    title: 'architecture validator'
+    milestone: 'M0'
+    dependencies:
+      - PR-004
+      - PR-005
+    parallel: true
+    risk: 'médio'
+    result: 'DAG de crates'
+  - id: PR-010
+    title: 'quality gate aggregator'
+    milestone: 'M0'
+    dependencies:
+      - PR-007
+      - PR-008
+      - PR-009
+    parallel: false
+    risk: 'alto'
+    result: 'merge authority'
+  - id: PR-011
+    title: 'Tauri shell bootstrap'
+    milestone: 'M1'
+    dependencies:
+      - PR-004
+      - PR-007
+    parallel: true
+    risk: 'médio'
+    result: 'app shell'
+  - id: PR-012
+    title: 'frontend-shell contract'
+    milestone: 'M1'
+    dependencies:
+      - PR-011
+    parallel: true
+    risk: 'médio'
+    result: 'UI typed boundary'
+  - id: PR-013
+    title: 'Servo embedding spike'
+    milestone: 'M1'
+    dependencies:
+      - PR-004
+      - PR-011
+    parallel: true
+    risk: 'alto'
+    result: 'evidence de API/event loop'
+  - id: PR-014
+    title: 'native render surface spike'
+    milestone: 'M1'
+    dependencies:
+      - PR-013
+    parallel: false
+    risk: 'alto'
+    result: 'surface/input/resize'
+  - id: PR-015
+    title: 'provisional engine API + fake engine'
+    milestone: 'M1'
+    dependencies:
+      - PR-009
+      - PR-013
+      - PR-014
+    parallel: false
+    risk: 'alto'
+    result: 'contract mínimo pós-surface'
+  - id: PR-016
+    title: 'Servo adapter pinned smoke'
+    milestone: 'M1'
+    dependencies:
+      - PR-013
+      - PR-014
+      - PR-015
+    parallel: false
+    risk: 'alto'
+    result: 'adapter real'
+  - id: PR-017
+    title: 'cross-platform host matrix'
+    milestone: 'M1'
+    dependencies:
+      - PR-011
+      - PR-014
+      - PR-016
+    parallel: false
+    risk: 'alto'
+    result: 'OS evidence'
+  - id: PR-018
+    title: 'package/release skeleton'
+    milestone: 'M1'
+    dependencies:
+      - PR-006
+      - PR-017
+    parallel: true
+    risk: 'médio'
+    result: 'build artifacts'
+  - id: PR-019
+    title: 'domain IDs/value objects'
+    milestone: 'M2'
+    dependencies:
+      - PR-015
+    parallel: true
+    risk: 'baixo'
+    result: 'types estáveis'
+  - id: PR-020
+    title: 'core actor/lifecycle'
+    milestone: 'M2'
+    dependencies:
+      - PR-015
+      - PR-019
+    parallel: false
+    risk: 'alto'
+    result: 'state owner + runtime contract'
+  - id: PR-021
+    title: 'command/event envelopes'
+    milestone: 'M2'
+    dependencies:
+      - PR-015
+      - PR-019
+    parallel: true
+    risk: 'alto'
+    result: 'protocol versionado'
+  - id: PR-022
+    title: 'navigation state machine'
+    milestone: 'M2'
+    dependencies:
+      - PR-019
+      - PR-020
+      - PR-021
+    parallel: false
+    risk: 'alto'
+    result: 'navigation policy/state'
+  - id: PR-023
+    title: 'engine host lifecycle'
+    milestone: 'M2'
+    dependencies:
+      - PR-015
+      - PR-020
+      - PR-021
+    parallel: false
+    risk: 'alto'
+    result: 'fake-host actor e execução'
+  - id: PR-024
+    title: 'typed Tauri IPC bridge'
+    milestone: 'M2'
+    dependencies:
+      - PR-011
+      - PR-012
+      - PR-021
+      - PR-022
+    parallel: false
+    risk: 'alto'
+    result: 'UI/core bridge'
+  - id: PR-025
+    title: 'single-tab fake-engine vertical slice'
+    milestone: 'M2'
+    dependencies:
+      - PR-022
+      - PR-023
+      - PR-024
+    parallel: false
+    risk: 'alto'
+    result: 'core/UI contract slice'
+  - id: PR-026
+    title: 'real Servo/surface thin integration'
+    milestone: 'M2'
+    dependencies:
+      - PR-014
+      - PR-016
+      - PR-025
+    parallel: false
+    risk: 'crítico'
+    result: 'first real page/input'
+  - id: PR-027
+    title: 'nav controls/error UX'
+    milestone: 'M2'
+    dependencies:
+      - PR-025
+      - PR-026
+    parallel: true
+    risk: 'médio'
+    result: 'MVP controls'
+  - id: PR-028
+    title: 'crash/restart policy'
+    milestone: 'M2'
+    dependencies:
+      - PR-023
+      - PR-025
+    parallel: true
+    risk: 'alto'
+    result: 'tab recovery'
+  - id: PR-029
+    title: 'MVP reference-platform E2E/smoke'
+    milestone: 'M2'
+    dependencies:
+      - PR-017
+      - PR-027
+      - PR-028
+    parallel: false
+    risk: 'alto'
+    result: 'MVP evidence; other OS feasibility'
+  - id: PR-030
+    title: 'tab domain model'
+    milestone: 'M3'
+    dependencies:
+      - PR-019
+      - PR-020
+    parallel: true
+    risk: 'médio'
+    result: 'tab state'
+  - id: PR-031
+    title: 'tab manager/events'
+    milestone: 'M3'
+    dependencies:
+      - PR-022
+      - PR-023
+      - PR-030
+    parallel: false
+    risk: 'alto'
+    result: 'lifecycle orchestration'
+  - id: PR-032
+    title: 'tab strip UI'
+    milestone: 'M3'
+    dependencies:
+      - PR-012
+      - PR-024
+      - PR-031
+    parallel: true
+    risk: 'baixo'
+    result: 'visible tab chrome'
+  - id: PR-033
+    title: 'tab open/close/switch'
+    milestone: 'M3'
+    dependencies:
+      - PR-031
+      - PR-032
+    parallel: false
+    risk: 'médio'
+    result: 'multi-tab behavior'
+  - id: PR-034
+    title: 'popup/new-window policy'
+    milestone: 'M3'
+    dependencies:
+      - PR-016
+      - PR-022
+      - PR-031
+    parallel: true
+    risk: 'alto'
+    result: 'controlled popups'
+  - id: PR-035
+    title: 'session schema'
+    milestone: 'M3'
+    dependencies:
+      - PR-019
+      - PR-022
+      - PR-030
+    parallel: true
+    risk: 'alto'
+    result: 'persisted contract'
+  - id: PR-036
+    title: 'session restore/shutdown'
+    milestone: 'M3'
+    dependencies:
+      - PR-020
+      - PR-028
+      - PR-035
+      - PR-037
+    parallel: false
+    risk: 'alto'
+    result: 'recovery transaction'
+  - id: PR-037
+    title: 'profile storage/locking'
+    milestone: 'M3'
+    dependencies:
+      - PR-019
+      - PR-035
+    parallel: false
+    risk: 'alto'
+    result: 'profile owner'
+  - id: PR-038
+    title: 'history'
+    milestone: 'M3'
+    dependencies:
+      - PR-022
+      - PR-037
+    parallel: true
+    risk: 'médio'
+    result: 'durable history'
+  - id: PR-039
+    title: 'bookmarks'
+    milestone: 'M3'
+    dependencies:
+      - PR-032
+      - PR-037
+    parallel: true
+    risk: 'baixo'
+    result: 'durable bookmarks'
+  - id: PR-040
+    title: 'download broker/policy'
+    milestone: 'M3'
+    dependencies:
+      - PR-016
+      - PR-022
+      - PR-037
+    parallel: false
+    risk: 'alto'
+    result: 'safe download path'
+  - id: PR-041
+    title: 'download UI/recovery'
+    milestone: 'M3'
+    dependencies:
+      - PR-032
+      - PR-040
+    parallel: true
+    risk: 'médio'
+    result: 'progress/restart'
+  - id: PR-042
+    title: 'permissions state/policy'
+    milestone: 'M4'
+    dependencies:
+      - PR-022
+      - PR-037
+    parallel: true
+    risk: 'alto'
+    result: 'scoped grants'
+  - id: PR-043
+    title: 'permission prompts'
+    milestone: 'M4'
+    dependencies:
+      - PR-024
+      - PR-042
+    parallel: false
+    risk: 'alto'
+    result: 'user decision UI'
+  - id: PR-044
+    title: 'scheme/file navigation security'
+    milestone: 'M4'
+    dependencies:
+      - PR-022
+      - PR-040
+      - PR-042
+    parallel: false
+    risk: 'alto'
+    result: 'browser security boundary'
+  - id: PR-045
+    title: 'Tauri CSP/capabilities hardening'
+    milestone: 'M4'
+    dependencies:
+      - PR-011
+      - PR-012
+      - PR-024
+    parallel: false
+    risk: 'alto'
+    result: 'privileged UI locked'
+  - id: PR-046
+    title: 'privacy clearing/partition'
+    milestone: 'M4'
+    dependencies:
+      - PR-037
+      - PR-038
+      - PR-039
+      - PR-042
+    parallel: true
+    risk: 'alto'
+    result: 'data control'
+  - id: PR-047
+    title: 'diagnostics redaction'
+    milestone: 'M4'
+    dependencies:
+      - PR-028
+      - PR-046
+    parallel: true
+    risk: 'médio'
+    result: 'safe observability'
+  - id: PR-048
+    title: 'threat/abuse regression suite'
+    milestone: 'M4'
+    dependencies:
+      - PR-044
+      - PR-045
+      - PR-046
+      - PR-047
+    parallel: false
+    risk: 'alto'
+    result: 'security exit evidence'
+  - id: PR-049
+    title: 'WPT harness/pin'
+    milestone: 'M5'
+    dependencies:
+      - PR-016
+      - PR-026
+      - PR-044
+    parallel: true
+    risk: 'alto'
+    result: 'web compatibility runner'
+  - id: PR-050
+    title: 'WPT expectations/triage'
+    milestone: 'M5'
+    dependencies:
+      - PR-049
+    parallel: true
+    risk: 'alto'
+    result: 'no hidden regressions'
+  - id: PR-051
+    title: 'platform input/accessibility'
+    milestone: 'M5'
+    dependencies:
+      - PR-017
+      - PR-026
+    parallel: true
+    risk: 'médio'
+    result: 'platform contract'
+  - id: PR-052
+    title: 'Windows packaging'
+    milestone: 'M5'
+    dependencies:
+      - PR-018
+      - PR-051
+    parallel: true
+    risk: 'alto'
+    result: 'Windows installer'
+  - id: PR-053
+    title: 'Linux packaging'
+    milestone: 'M5'
+    dependencies:
+      - PR-018
+      - PR-051
+    parallel: true
+    risk: 'médio'
+    result: 'Linux artifact'
+  - id: PR-054
+    title: 'macOS packaging'
+    milestone: 'M5'
+    dependencies:
+      - PR-018
+      - PR-051
+    parallel: true
+    risk: 'alto'
+    result: 'macOS artifact'
+  - id: PR-055
+    title: 'performance baseline'
+    milestone: 'M5'
+    dependencies:
+      - PR-026
+      - PR-029
+      - PR-051
+    parallel: true
+    risk: 'médio'
+    result: 'measured budgets input'
+  - id: PR-056
+    title: 'stress/fuzz/soak'
+    milestone: 'M5'
+    dependencies:
+      - PR-028
+      - PR-049
+    parallel: true
+    risk: 'alto'
+    result: 'resilience corpus'
+  - id: PR-057
+    title: 'minimal DevTools/diagnostics'
+    milestone: 'M6'
+    dependencies:
+      - PR-042
+      - PR-047
+      - PR-049
+    parallel: true
+    risk: 'alto'
+    result: 'controlled debug surface'
+  - id: PR-058
+    title: 'extensions boundary spike'
+    milestone: 'M6'
+    dependencies:
+      - PR-043
+      - PR-045
+      - PR-048
+    parallel: true
+    risk: 'alto'
+    result: 'no premature extension API'
+  - id: PR-059
+    title: 'signed artifacts/SBOM/provenance'
+    milestone: 'M6'
+    dependencies:
+      - PR-008
+      - PR-018
+      - PR-052
+      - PR-053
+      - PR-054
+    parallel: false
+    risk: 'alto'
+    result: 'release trust chain'
+  - id: PR-060
+    title: 'channels/updater/recovery'
+    milestone: 'M6'
+    dependencies:
+      - PR-046
+      - PR-059
+    parallel: false
+    risk: 'alto'
+    result: 'verified update'
+  - id: PR-061
+    title: 'Alpha exit gate'
+    milestone: 'M7'
+    dependencies:
+      - PR-029
+      - PR-037
+      - PR-040
+      - PR-041
+      - PR-043
+      - PR-048
+      - PR-049
+      - PR-050
+      - PR-052
+      - PR-053
+      - PR-054
+      - PR-059
+    parallel: false
+    risk: 'alto'
+    result: 'signed alpha decision'
+  - id: PR-062
+    title: 'Beta stability gate'
+    milestone: 'M7'
+    dependencies:
+      - PR-055
+      - PR-056
+      - PR-060
+      - PR-061
+    parallel: false
+    risk: 'alto'
+    result: 'beta decision'
+  - id: PR-063
+    title: 'Stable 1.0 gate'
+    milestone: 'M8'
+    dependencies:
+      - PR-048
+      - PR-050
+      - PR-055
+      - PR-056
+      - PR-058
+      - PR-060
+      - PR-062
+      - PR-065
+      - PR-066
+      - PR-069
+      - PR-070
+    parallel: false
+    risk: 'crítico'
+    result: 'stable decision; isolation mandatory'
+  - id: PR-064
+    title: 'engine host process spike'
+    milestone: 'M8'
+    dependencies:
+      - PR-015
+      - PR-028
+      - PR-055
+    parallel: true
+    risk: 'alto'
+    result: 'process seam evidence'
+  - id: PR-065
+    title: 'process manager/sandbox prototype'
+    milestone: 'M8'
+    dependencies:
+      - PR-048
+      - PR-064
+    parallel: false
+    risk: 'crítico'
+    result: 'isolation evidence'
+  - id: PR-066
+    title: 'renderer/site isolation evaluation'
+    milestone: 'M8'
+    dependencies:
+      - PR-048
+      - PR-065
+    parallel: false
+    risk: 'crítico'
+    result: 'security decision'
+  - id: PR-067
+    title: 'network/GPU split decision'
+    milestone: 'M8'
+    dependencies:
+      - PR-055
+      - PR-064
+      - PR-065
+    parallel: true
+    risk: 'alto'
+    result: 'evidence-based split'
+  - id: PR-068
+    title: 'second engine adapter'
+    milestone: 'M8'
+    dependencies:
+      - PR-015
+      - PR-049
+      - PR-067
+    parallel: true
+    risk: 'alto'
+    result: 'multi-engine proof'
+  - id: PR-069
+    title: 'production engine-host rollout'
+    milestone: 'M8'
+    dependencies:
+      - PR-028
+      - PR-055
+      - PR-064
+      - PR-065
+      - PR-066
+    parallel: false
+    risk: 'crítico'
+    result: 'production process boundary'
+  - id: PR-070
+    title: 'recovery/security drills'
+    milestone: 'M8'
+    dependencies:
+      - PR-060
+      - PR-065
+      - PR-066
+      - PR-069
+    parallel: false
+    risk: 'crítico'
+    result: 'operational readiness'

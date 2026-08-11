@@ -1,0 +1,94 @@
+schema_version: 1
+status: proposed
+authority: ARCHITECTURE.md
+validated_against_cargo_metadata: false
+validation_command: xtask architecture-check
+
+phases:
+  M0:
+    packages:
+      - browser-domain
+      - browser-core
+      - engine-api
+      - test-support
+      - xtask
+    runtime_edges:
+      browser-core: [browser-domain, engine-api]
+      test-support: []
+      xtask: []
+  M1:
+    adds:
+      - platform
+      - render-surface
+      - servo-engine
+      - engine-host
+    runtime_edges:
+      platform: [browser-domain]
+      render-surface: [browser-domain, platform]
+      servo-engine: [engine-api, render-surface]
+      engine-host: [engine-api, render-surface]
+  M2:
+    adds:
+      - storage
+      - security
+    runtime_edges:
+      browser-core: [browser-domain, engine-api, engine-host, platform, security, storage]
+      security: [browser-domain]
+      storage: [browser-domain]
+  M3_plus:
+    additions_are_allowed_only_with_adr: true
+    candidate_modules_before_extraction:
+      - navigation
+      - tabs
+      - profiles
+      - history
+      - bookmarks
+      - downloads
+      - permissions
+      - privacy
+      - telemetry
+
+ui_boundary:
+  frontend_runtime_depends_on:
+    - generated-ui-schema
+  frontend_forbidden_dependencies:
+    - browser-core
+    - servo-engine
+    - storage
+    - platform-filesystem
+  apps_desktop_depends_on:
+    - browser-core
+    - platform
+    - tauri
+
+forbidden_edges:
+  - [browser-domain, tauri]
+  - [browser-domain, servo-engine]
+  - [browser-domain, tokio]
+  - [browser-core, servo-engine]
+  - [servo-engine, browser-core]
+  - [frontend, storage]
+  - [frontend, servo-engine]
+  - [test-support, production-runtime]
+  - [any-domain-crate, apps-desktop]
+
+extraction_policy:
+  require_adr: true
+  require_owner: true
+  require_public_contract: true
+  require_independent_tests: true
+  extract_when:
+    - separate owner or security boundary
+    - at least two production consumers
+    - independent compile/test cadence
+  absorb_when:
+    - one consumer
+    - no stable public contract
+    - extraction would add only forwarding code
+
+transition_rules:
+  undeclared_package: fail
+  undeclared_edge: fail
+  forbidden_edge: fail
+  cycle: fail
+  proposed_adr_used_as_authority: fail
