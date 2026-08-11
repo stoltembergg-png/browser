@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible defect without publishing sensitive security details.
+title: "[Bug] "
+labels:
+  - type:test
+  - status:ready
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For security vulnerabilities use the private process in `SECURITY.md`, not this public form. Redact tokens, cookies, history, personal data and private URLs.
+  - type: input
+    id: plan_id
+    attributes:
+      label: Stable plan ID or Issue
+      placeholder: PR-000 / #123
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit, tag or artifact version
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Reference platform only
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal deterministic steps and expected/actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Redacted logs, test output and artifact identity. Do not upload secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression and rollback
+      description: Last known good, suspected change and safe mitigation.
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Report hygiene
+      options:
+        - label: I removed secrets, tokens, cookies, PII and private URLs.
+          required: true
+        - label: I searched existing Issues and did not duplicate a known report.
+          required: true

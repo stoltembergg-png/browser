@@ -41,6 +41,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 22. [CURRENT_STATE.md](CURRENT_STATE.md) — snapshot operacional de milestone, wave, blockers e próximo gate.
 23. [docs/development/CRITICAL_PATH.md](docs/development/CRITICAL_PATH.md) — caminho crítico até o MVP e blockers.
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
+
 25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
 26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.
 27. [docs/LICENSE_POLICY.md](docs/LICENSE_POLICY.md) — política de licença ainda não ratificada.
@@ -51,6 +52,9 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 32. [docs/agents/HERMES_VPS.md](docs/agents/HERMES_VPS.md) — contrato operacional específico do executor Hermes na VPS; não substitui as fontes normativas.
 33. [docs/specs/README.md](docs/specs/README.md) — regras para especificações e acceptance criteria.
 34. [docs/specs/SPEC-000-template.md](docs/specs/SPEC-000-template.md) — template de specification; não é autoridade.
+35. [.github/pull_request_template.md](.github/pull_request_template.md) — contrato/checklist de PR.
+36. [.github/CODEOWNERS](.github/CODEOWNERS) — ownership do mantenedor nos trust paths.
+37. [docs/development/GITHUB_LABELS.md](docs/development/GITHUB_LABELS.md) — taxonomia de labels semânticas.
 
 ## Ordem de leitura
 

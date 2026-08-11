@@ -1,0 +1,53 @@
+name: Architecture proposal
+description: Record a decision or contract that must be reviewed as an ADR.
+title: "[Architecture] "
+labels:
+  - area:architecture
+  - type:docs
+  - status:blocked
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An architecture proposal is not permission to implement. Use `docs/decisions/ADR-000-template.md`, record alternatives/evidence/rollback and keep the status `proposed` until the required gate is satisfied.
+  - type: input
+    id: plan_id
+    attributes:
+      label: Stable plan ID
+      placeholder: PR-000 / Q-000
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and problem
+    validations:
+      required: true
+  - type: textarea
+    id: decision
+    attributes:
+      label: Proposed decision
+      description: State what would be accepted, without inventing APIs or implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and evidence
+      description: Include rejected options, costs, risks and primary sources.
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security, privacy and failure impact
+      description: Include negative cases, boundaries and rollback.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance and ADR gate
+      description: Link executable tests/spikes and the owner required to ratify the decision.
+    validations:
+      required: true

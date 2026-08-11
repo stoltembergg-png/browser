@@ -1,0 +1,13 @@
+# CODEOWNERS
+
+# Human ownership is required for trust paths. Agents/bots are never CODEOWNERS.
+* @stoltembergg-png
+
+/.github/ @stoltembergg-png
+/security/ @stoltembergg-png
+/servo-engine/ @stoltembergg-png
+/browser-core/ @stoltembergg-png
+/platform/ @stoltembergg-png
+/release/ @stoltembergg-png
+/docs/gates/ @stoltembergg-png
+/docs/contracts/ @stoltembergg-png
