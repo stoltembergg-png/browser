@@ -1,37 +1,41 @@
 {
+  "snapshot_at": "2026-08-11T17:56:36-03:00",
+  "source": "GitHub API live query before this snapshot commit",
+  "authority": "GitHub live state, not this file",
+  "notes": "last_verified_head_sha is a historical verification point; changing this file changes PR-001 head and therefore requires another live query",
   "PR-001": {
     "issue": 1,
     "draft_pr": 71,
     "branch": "docs/pr-001-repository-governance",
-    "head_sha": "f7d2ad0ce41a2a2a9ac5a20041ca26ea63ea7181",
+    "last_verified_head_sha": "aebc99321f8297e0e66fd2e95d57ebf26955fb6f",
     "state": "OPEN_DRAFT"
   },
   "PR-002": {
     "issue": 2,
     "draft_pr": 72,
     "branch": "docs/pr-002-adr-spec-templates",
-    "head_sha": "fda370ee88d0f432c246cc53c297a66b85fa31be",
+    "last_verified_head_sha": "fda370ee88d0f432c246cc53c297a66b85fa31be",
     "state": "OPEN_DRAFT"
   },
   "PR-003": {
     "issue": 3,
     "draft_pr": 73,
     "branch": "docs/pr-003-policy-contracts",
-    "head_sha": "6c3b8ce4770d3203bdde02a1faa9afd4099ef004",
+    "last_verified_head_sha": "57ff144c784764c60c352a05ed56e5211148c78a",
     "state": "OPEN_DRAFT"
   },
   "PR-004": {
     "issue": 4,
     "draft_pr": 74,
     "branch": "docs/pr-004-workspace-contract",
-    "head_sha": "ae6c619a88e51fb856bd58d2199666d49d945b9c",
+    "last_verified_head_sha": "ae6c619a88e51fb856bd58d2199666d49d945b9c",
     "state": "OPEN_DRAFT"
   },
   "PR-005": {
     "issue": 5,
     "draft_pr": 75,
     "branch": "docs/pr-005-dependency-policy",
-    "head_sha": "20f03733935744d467147bdc59de52112444fd70",
+    "last_verified_head_sha": "20f03733935744d467147bdc59de52112444fd70",
     "state": "OPEN_DRAFT"
   }
 }

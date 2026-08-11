@@ -30,7 +30,7 @@
 | `docs/development/EXECUTION_MAP.md` | materialization/operations | mapa milestone → Issue → Draft PR → gates | `PR_PLAN.md` + GitHub mapping |
 | `docs/development/WAVE-001.md` | materialization/operations | primeira wave e evidence mapping | GitHub API + `docs/pr-dag.yaml` |
 | `docs/development/github-issue-map.json` | materialization/operations | ID estável → Issue number | GitHub API snapshot |
-| `docs/development/github-pr-map.json` | materialization/operations | ID estável → Draft PR/branch/head SHA | GitHub API + git |
+| `docs/development/github-pr-map.json` | materialization/operations | ID estável → Draft PR/branch/last-verified head SHA | GitHub API + git |
 | `docs/development/STATE_SYNC.md` | materialization/operations | estratégia de geração/reconciliação de estado | GitHub API + future state-sync workflow |
 
 ## O que não deve entrar no repositório

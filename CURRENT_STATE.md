@@ -11,7 +11,7 @@
 - **Produto:** nenhum código de navegador implementado.
 - **Repository:** `stoltembergg-png/browser`, branch de estado `docs/pr-001-repository-governance`, base `b6cfede…`.
 - **Issues:** 70 materializadas; `PR-001`→`#1` até `PR-070`→`#70` (`docs/development/github-issue-map.json`).
-- **Draft PRs:** 5 abertas em Draft, `#71`–`#75` (`docs/development/github-pr-map.json`).
+- **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas last-verified snapshots (`docs/development/github-pr-map.json`).
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
 - **Control-plane:** `UNVERIFIED`; sem merge/release automático.
 
