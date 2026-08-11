@@ -44,6 +44,9 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
 26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.
 27. [docs/LICENSE_POLICY.md](docs/LICENSE_POLICY.md) — política de licença ainda não ratificada.
+28. [docs/development/WAVE-001.md](docs/development/WAVE-001.md) — primeira wave e evidence mapping.
+29. [docs/development/github-issue-map.json](docs/development/github-issue-map.json) — IDs estáveis para Issues GitHub.
+30. [docs/development/github-pr-map.json](docs/development/github-pr-map.json) — IDs estáveis para Draft PRs, branches e SHAs.
 
 ## Ordem de leitura
 
