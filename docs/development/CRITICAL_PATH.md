@@ -21,22 +21,20 @@ Este grafo é pré-requisito para tratar qualquer Draft PR como executável. `PR
 ## Spine técnico até MVP
 
 ```text
-PR-010 Quality Gate aggregator
-  → PR-011 Tauri shell
-  → PR-013 Servo embedding spike
-  → PR-014 render surface spike
-  → PR-015 provisional engine contract/fake
-  → PR-019 domain IDs
-  → PR-020 browser-core actor/lifecycle
-  → PR-022 navigation state machine
-  → PR-024 typed Tauri IPC
-  → PR-025 fake-engine vertical slice
-  → PR-026 real Servo/surface thin integration
-  → PR-027 navigation controls/error UX
-  → PR-029 reference-platform MVP smoke
+PR-004 + PR-007 → PR-011 Tauri shell
+PR-011 → PR-013 Servo embedding spike → PR-014 render surface spike
+PR-009 + PR-013 + PR-014 → PR-015 provisional engine contract/fake
+PR-015 → PR-019 domain IDs → PR-020 core lifecycle
+PR-019 + PR-020 + PR-021 → PR-022 navigation state machine
+PR-011 + PR-012 + PR-021 + PR-022 → PR-024 typed Tauri IPC
+PR-022 + PR-023 + PR-024 → PR-025 fake-engine vertical slice
+PR-014 + PR-016 + PR-025 → PR-026 real Servo/surface thin integration
+PR-025 + PR-026 → PR-027 navigation controls/error UX
+PR-023 + PR-025 → PR-028 crash/restart policy
+PR-017 + PR-027 + PR-028 → PR-029 reference-platform MVP smoke
 ```
 
-A integração real não pode iniciar antes de `PR-013`, `PR-014` e `PR-015` produzirem evidência. O fake engine não substitui `PR-026`.
+`PR-010` é o aggregator/gate operacional de `PR-007`/`PR-008`/`PR-009`, mas não é uma edge direta de implementação para `PR-011` no DAG atual. A integração real não pode iniciar antes de `PR-013`, `PR-014`, `PR-015` e os adapters/smokes correspondentes produzirem evidência. O fake engine não substitui `PR-026`.
 
 ## Predecessores paralelos que convergem no MVP
 
