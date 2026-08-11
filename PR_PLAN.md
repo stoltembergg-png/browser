@@ -552,7 +552,7 @@ flowchart TD
 - **Objective:** minimize frontend capabilities and prevent page-to-core privilege crossing.
 - **Dependencies:** 011–012,024. **Parallel:** não.
 - **Scope:** capability files, CSP, command allowlist. **Out:** page content in Tauri webview.
-- **Tests/AC:** capability/CSP lint, negative IPC por origem/janela/iframe/tab/generation, filesystem/network/process denial, remote navigation blocked e CSP fixture; nenhuma tentativa privilegiada produz efeito.
+- **Tests/AC:** capability/CSP lint, negative IPC por origem/janela/iframe/tab/generation, redirect/popup/opener para a origem privilegiada, filesystem/network/process denial, remote navigation blocked e CSP fixture; nenhuma tentativa privilegiada produz efeito.
 - **Risks/Rollback:** alto; deny plugin/command, no broad allowlist fallback.
 - **Docs:** ADR-002/007, SECURITY.
 
@@ -634,7 +634,7 @@ flowchart TD
 - **Objective:** benchmark harness and measured manifest.
 - **Dependencies:** 026,029,051. **Parallel:** sim.
 - **Scope:** cold/warm startup, new tab, navigation, memory, frame responsiveness, shutdown. **Out:** arbitrary budgets.
-- **Tests/AC:** repeatable fixture, p50/p95 and environment metadata.
+- **Tests/AC:** repeatable fixture com workload/fixture hash, warmup, repetições, hardware/runner/OS/engine/flags, variância/outlier policy e p50/p95; baseline update exige justificativa revisável e regressão sintética conhecida que falhe.
 - **Risks/Rollback:** médio; artifact informational until ADR.
 - **Docs:** performance budget ADR proposal.
 
@@ -660,7 +660,7 @@ flowchart TD
 - **Objective:** decide manifest, isolated world, permissions, lifecycle and process model before API.
 - **Dependencies:** 043,045,048. **Parallel:** sim.
 - **Scope:** threat/contract spike. **Out:** extension store or broad implementation.
-- **Tests/AC:** privilege matrix and malicious extension scenarios; explicit go/no-go.
+- **Tests/AC:** manifest/runtime capability com `extensions=false` no MVP, ausência de loader/API empacotado, tentativa hostil de ativação rejeitada, privilege matrix e malicious extension scenarios; explicit go/no-go.
 - **Risks/Rollback:** alto; keep feature out of stable.
 - **Docs:** ADR/extensions, THREAT_MODEL update.
 

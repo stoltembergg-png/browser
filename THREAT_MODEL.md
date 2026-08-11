@@ -34,15 +34,16 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 ## Abuse-case acceptance tests
 
 1. Uma página fixture tenta `invoke`/command no frontend: não existe bridge de página e nenhum comando é executado.
-2. Um payload IPC com campo extra, tamanho excessivo, tab de outro profile e request duplicado: cada caso é rejeitado com erro observável.
-3. Um event stream envia `NavigationFinished` para generation antiga: core não altera o tab atual.
-4. Uma URL `file://`, `data:`, `javascript:` top-level e custom protocol: cada uma segue decisão explicitamente testada; default deny onde não há contrato.
-5. Um download tenta `../../`, nome reservado Windows, ADS, colisão e cancelamento: nenhum arquivo sai do root/broker.
-6. Origin A obtém grant; origin B solicita a mesma capability: B não herda a decisão.
-7. Update com assinatura errada, hash errado, downgrade, canal incompatível, metadata expirada e key revogada: instalação falha e last-known-good permanece.
-8. PR de fork tenta ler secret, alterar workflow gate, injetar texto no reporter e publicar artifact: não recebe secret; gates/identity rejeitam a evidência.
-9. Processo do engine morre durante navegação/download/form submission: tab entra em Crash; nenhum POST/form é reenviado automaticamente.
-10. Migration é interrompida em cada passo: reinício recupera snapshot válido ou executa rollback próprio; nunca marca sucesso sem schema completo.
+2. Uma página na surface de conteúdo tenta redirect para a origem privilegiada, abrir popup/opener ou navegar um iframe: a surface, origem, capabilities e processo permanecem no contexto não privilegiado; nenhum comando é executado.
+3. Um payload IPC com campo extra, tamanho excessivo, tab de outro profile e request duplicado: cada caso é rejeitado com erro observável.
+4. Um event stream envia `NavigationFinished` para generation antiga: core não altera o tab atual.
+5. Uma URL `file://`, `data:`, `javascript:` top-level e custom protocol: cada uma segue decisão explicitamente testada; default deny onde não há contrato.
+6. Um download tenta `../../`, nome reservado Windows, ADS, colisão e cancelamento: nenhum arquivo sai do root/broker.
+7. Origin A obtém grant; origin B solicita a mesma capability: B não herda a decisão.
+8. Update com assinatura errada, hash errado, downgrade, canal incompatível, metadata expirada e key revogada: instalação falha e last-known-good permanece.
+9. PR de fork tenta ler secret, alterar workflow gate, injetar texto no reporter e publicar artifact: não recebe secret; gates/identity rejeitam a evidência.
+10. Processo do engine morre durante navegação/download/form submission: tab entra em Crash; nenhum POST/form é reenviado automaticamente.
+11. Migration é interrompida em cada passo: reinício recupera snapshot válido ou executa rollback próprio; nunca marca sucesso sem schema completo.
 
 ## Security claims permitidos
 
