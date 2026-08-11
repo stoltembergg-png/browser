@@ -31,7 +31,7 @@ Cada item precisa de Definition of Ready, Issue estruturada, ownership exclusivo
 
 | Stable ID | Issue | Draft PR | Branch | Last verified head SHA |
 |---|---:|---:|---|---|
-| `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `aebc99321f8297e0e66fd2e95d57ebf26955fb6f` |
+| `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `0bf0566076db25800c34959618a479227c95dc31` |
 | `PR-002` | #2 | #72 | `docs/pr-002-adr-spec-templates` | `fda370ee88d0f432c246cc53c297a66b85fa31be` |
 | `PR-003` | #3 | #73 | `docs/pr-003-policy-contracts` | `57ff144c784764c60c352a05ed56e5211148c78a` |
 | `PR-004` | #4 | #74 | `docs/pr-004-workspace-contract` | `ae6c619a88e51fb856bd58d2199666d49d945b9c` |
