@@ -272,7 +272,7 @@ flowchart TD
 
 #### PR-011 — Tauri shell bootstrap
 - **Objective:** app Tauri mínimo com lifecycle de janela e frontend local.
-- **Dependencies:** 004,007. **Parallel:** sim.
+- **Dependencies:** 004,007,010. **Parallel:** sim.
 - **Scope:** shell only. **Out:** page navigation, Servo.
 - **Tests/AC:** app abre/fecha em Linux/Windows/macOS conforme runner; no remote URL.
 - **Risks/Rollback:** médio; remover shell mantendo workspace.
@@ -308,7 +308,7 @@ flowchart TD
 - **Scope:** commands/events/errors/capabilities/lifecycle mínimos, sem congelar extensões de permission/download/popup/DevTools. **Out:** tipos Servo, IPC real.
 - **Tests/AC:** contract suite red/green; unknown versions, cancellation, terminal results e capability negotiation testados; qualquer comando fora do subset é rejeitado.
 - **Risks/Rollback:** alto; version bump/superseding ADR, não breaking rename silencioso.
-- **Docs:** ADR-004, engine contract, `docs/contracts/runtime-lifecycle.md`.
+- **Docs:** ADR-004 como decisão proposta/provisória, engine contract, `docs/contracts/runtime-lifecycle.md`. A aceitação/ratificação de ADR-004 é gate posterior antes de PR-020/021/025/026.
 
 #### PR-016 — Servo adapter pinned smoke
 - **Objective:** adapter traduzir o contrato mínimo para a revisão Servo aprovada pelo spike.

@@ -21,7 +21,7 @@ Este grafo é pré-requisito para tratar qualquer Draft PR como executável. `PR
 ## Spine técnico até MVP
 
 ```text
-PR-004 + PR-007 → PR-011 Tauri shell
+PR-004 + PR-007 + PR-010 → PR-011 Tauri shell
 PR-011 → PR-013 Servo embedding spike → PR-014 render surface spike
 PR-009 + PR-013 + PR-014 → PR-015 provisional engine contract/fake
 PR-015 → PR-019 domain IDs → PR-020 core lifecycle
@@ -34,7 +34,7 @@ PR-023 + PR-025 → PR-028 crash/restart policy
 PR-017 + PR-027 + PR-028 → PR-029 reference-platform MVP smoke
 ```
 
-`PR-010` é o aggregator/gate operacional de `PR-007`/`PR-008`/`PR-009`, mas não é uma edge direta de implementação para `PR-011` no DAG atual. A integração real não pode iniciar antes de `PR-013`, `PR-014`, `PR-015` e os adapters/smokes correspondentes produzirem evidência. O fake engine não substitui `PR-026`.
+`PR-010` é o aggregator/gate operacional de `PR-007`/`PR-008`/`PR-009` e é dependência explícita de `PR-011`. A integração real não pode iniciar antes de `PR-013`, `PR-014`, `PR-015` e os adapters/smokes correspondentes produzirem evidência. O fake engine não substitui `PR-026`.
 
 ## Predecessores paralelos que convergem no MVP
 

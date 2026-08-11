@@ -79,11 +79,11 @@ Todo Draft PR deve conter:
 
 ## Estado e atualização
 
-`CURRENT_STATE.md` contém o snapshot operacional atual. A materialização deve atualizar o mapa `PR-ID → Issue # → Draft PR # → head SHA` após cada criação e verificar que o corpo das Issues/PRs usa os números reais, sem substituir os IDs estáveis.
+`CURRENT_STATE.md` contém o snapshot operacional atual. A materialização deve atualizar o mapa `PR-ID → Issue # → Draft PR # → verified parent head SHA` após cada criação e verificar que o corpo das Issues/PRs usa os números reais, sem substituir os IDs estáveis. Um snapshot versionado dentro da própria PR não pode provar o head do commit que o contém; GitHub live continua sendo a autoridade.
 
 ## Snapshot GitHub — Wave 001
 
-| Stable ID | Issue | Draft PR | Branch | Last verified head SHA |
+| Stable ID | Issue | Draft PR | Branch | Verified parent head SHA |
 |---|---:|---:|---|---|
 | `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `0bf0566076db25800c34959618a479227c95dc31` |
 | `PR-002` | #2 | #72 | `docs/pr-002-adr-spec-templates` | `fda370ee88d0f432c246cc53c297a66b85fa31be` |

@@ -29,7 +29,7 @@ Cada item precisa de Definition of Ready, Issue estruturada, ownership exclusivo
 
 ## Evidence mapping
 
-| Stable ID | Issue | Draft PR | Branch | Last verified head SHA |
+| Stable ID | Issue | Draft PR | Branch | Verified parent head SHA |
 |---|---:|---:|---|---|
 | `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `0bf0566076db25800c34959618a479227c95dc31` |
 | `PR-002` | #2 | #72 | `docs/pr-002-adr-spec-templates` | `fda370ee88d0f432c246cc53c297a66b85fa31be` |
