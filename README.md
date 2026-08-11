@@ -41,6 +41,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 22. [CURRENT_STATE.md](CURRENT_STATE.md) — snapshot operacional de milestone, wave, blockers e próximo gate.
 23. [docs/development/CRITICAL_PATH.md](docs/development/CRITICAL_PATH.md) — caminho crítico até o MVP e blockers.
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
+<<<<<<< HEAD
 
 25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
 26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.
@@ -55,6 +56,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 35. [.github/pull_request_template.md](.github/pull_request_template.md) — contrato/checklist de PR.
 36. [.github/CODEOWNERS](.github/CODEOWNERS) — ownership do mantenedor nos trust paths.
 37. [docs/development/GITHUB_LABELS.md](docs/development/GITHUB_LABELS.md) — taxonomia de labels semânticas.
+38. [docs/security/GITHUB_ACTIONS_SECURITY.md](docs/security/GITHUB_ACTIONS_SECURITY.md) — policy de Actions, tokens, forks, artifacts e rollout.
 
 ## Ordem de leitura
 
