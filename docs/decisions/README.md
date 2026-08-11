@@ -24,3 +24,6 @@ Ainda não há ADR ratificado no repositório do produto. Os itens abaixo são a
 - Mudança em ADR ratificado exige ADR novo ou seção de supersession; editar história sem registrar motivo é proibido.
 - APIs instáveis do Servo devem ser citadas pela revisão exata usada no spike.
 - Decisões de segurança e supply chain exigem cenário negativo, não apenas descrição positiva.
+- Use `ADR-000-template.md` para decisões arquiteturais e `../specs/SPEC-000-template.md` para contratos e acceptance criteria.
+- Uma especificação pode detalhar uma Issue, mas não pode ratificar uma decisão aberta nem substituir o ADR requerido.
+- Toda decisão deve declarar impacto de segurança, testing/evidence, rollback e dependências.

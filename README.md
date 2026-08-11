@@ -49,6 +49,8 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 30. [docs/development/github-pr-map.json](docs/development/github-pr-map.json) — IDs estáveis para Draft PRs, branches e SHAs.
 31. [docs/development/STATE_SYNC.md](docs/development/STATE_SYNC.md) — estratégia de snapshot/derivação de estado a partir do GitHub.
 32. [docs/agents/HERMES_VPS.md](docs/agents/HERMES_VPS.md) — contrato operacional específico do executor Hermes na VPS; não substitui as fontes normativas.
+33. [docs/specs/README.md](docs/specs/README.md) — regras para especificações e acceptance criteria.
+34. [docs/specs/SPEC-000-template.md](docs/specs/SPEC-000-template.md) — template de specification; não é autoridade.
 
 ## Ordem de leitura
 
