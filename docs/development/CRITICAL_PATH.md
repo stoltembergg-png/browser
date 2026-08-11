@@ -4,26 +4,24 @@
 
 Este documento é uma visão operacional derivada de `ROADMAP.md`, `PR_PLAN.md` e `docs/pr-dag.yaml`. Os IDs abaixo são IDs estáveis do plano, não números do GitHub. O caminho só é comprovado quando cada predecessor tem Issue/PR, dependências resolvidas e evidência no SHA atual.
 
-## Spine de governança e quality gate
+## Fundação de governança e convergência do quality gate
 
 ```text
-PR-001 Repository governance
-  → PR-002 ADR/spec templates
-  → PR-003 PR/CODEOWNERS/policy contracts
-  → PR-006 CI trust baseline
-  → PR-007 format/lint/docs gate
-  → PR-010 Quality Gate aggregator
+PR-001 Repository governance → PR-002 ADR/spec templates → PR-003 policy contracts
+PR-001 Repository governance → PR-004 workspace → PR-005 toolchain/dependencies
+PR-003 + PR-005 → PR-006 CI trust baseline
+PR-005 + PR-006 → PR-007 format/lint/docs gate
+PR-005 + PR-006 → PR-008 dependency/security gate
+PR-004 + PR-005 → PR-009 architecture validator
+PR-007 + PR-008 + PR-009 → PR-010 Quality Gate aggregator
 ```
 
-Este spine é pré-requisito para tratar qualquer Draft PR como executável. `PR-008` e `PR-009` são paralelos a `PR-007` depois de `PR-005`, mas todos convergem em `PR-010`.
+Este grafo é pré-requisito para tratar qualquer Draft PR como executável. `PR-007`, `PR-008` e `PR-009` são paralelos depois de seus predecessores, mas todos convergem em `PR-010`. A ausência de qualquer um mantém o quality gate bloqueado.
 
 ## Spine técnico até MVP
 
 ```text
-PR-001/002/003
-  → PR-004 workspace
-  → PR-005 toolchain/dependencies
-  → PR-007 quality gate
+PR-010 Quality Gate aggregator
   → PR-011 Tauri shell
   → PR-013 Servo embedding spike
   → PR-014 render surface spike
