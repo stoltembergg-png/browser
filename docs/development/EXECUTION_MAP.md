@@ -85,7 +85,7 @@ Todo Draft PR deve conter:
 
 | Stable ID | Issue | Draft PR | Branch | Head SHA |
 |---|---:|---:|---|---|
-| `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `754313c4a7ce65e4e3bb6609d4b896da3bf34302` |
+| `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `f7d2ad0ce41a2a2a9ac5a20041ca26ea63ea7181` |
 | `PR-002` | #2 | #72 | `docs/pr-002-adr-spec-templates` | `fda370ee88d0f432c246cc53c297a66b85fa31be` |
 | `PR-003` | #3 | #73 | `docs/pr-003-policy-contracts` | `6c3b8ce4770d3203bdde02a1faa9afd4099ef004` |
 | `PR-004` | #4 | #74 | `docs/pr-004-workspace-contract` | `ae6c619a88e51fb856bd58d2199666d49d945b9c` |
