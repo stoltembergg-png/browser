@@ -28,6 +28,7 @@
 | `CURRENT_STATE.md` | materialization/operations | milestone atual, wave, blockers, Draft PRs e próximo gate | GitHub API + `PR_PLAN.md` |
 | `docs/development/CRITICAL_PATH.md` | materialization/operations | caminho crítico, paralelismo e blockers até MVP | `ROADMAP.md` + `docs/pr-dag.yaml` |
 | `docs/development/EXECUTION_MAP.md` | materialization/operations | mapa milestone → Issue → Draft PR → gates | `PR_PLAN.md` + GitHub mapping |
+| `docs/contracts/workspace-contract.md` | PR-004 | packages/edges planejados e invariantes do workspace | `cargo metadata` futuro |
 
 ## O que não deve entrar no repositório
 

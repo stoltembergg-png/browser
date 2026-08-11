@@ -41,6 +41,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 22. [CURRENT_STATE.md](CURRENT_STATE.md) — snapshot operacional de milestone, wave, blockers e próximo gate.
 23. [docs/development/CRITICAL_PATH.md](docs/development/CRITICAL_PATH.md) — caminho crítico até o MVP e blockers.
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
+25. [docs/contracts/workspace-contract.md](docs/contracts/workspace-contract.md) — contrato proposto do bootstrap Cargo, sem implementação.
 
 ## Ordem de leitura
 
