@@ -31,7 +31,10 @@ O repositório deve conter contratos estáveis; memória episódica de um agente
 | `docs/document-authority.yaml` | manifest machine-readable de presença, owner e autoridade documental | conteúdo normativo duplicado |
 | `docs/architecture-graph.yaml` | packages, edges permitidos/proibidos e regras de extração | lógica de runtime |
 | `docs/gates/release-gates.yaml` | critérios machine-readable de MVP/Alpha/Beta/Stable | implementação de features |
-| `docs/contracts/runtime-lifecycle.md` | estados, fencing, cancelamento, backpressure e recovery | detalhes de UI |
+| `docs/contracts/runtime-lifecycle.md` | lifecycle, fencing, cancelamento, backpressure e recovery | detalhes de UI |
+| `CURRENT_STATE.md` | snapshot operacional derivado do GitHub | decisões arquiteturais e histórico longo |
+| `docs/development/CRITICAL_PATH.md` | caminho crítico, paralelismo e blockers | estado episódico de uma Issue |
+| `docs/development/EXECUTION_MAP.md` | milestone → Issue → Draft PR → gate | contrato detalhado de uma PR |
 
 ## 3. `MEMORIES.md` e `SOUL.md`
 
@@ -41,7 +44,7 @@ Não pertencem ao repositório do produto. `MEMORIES.md` tende a capturar estado
 
 Antes de alterar qualquer arquivo:
 
-1. ler `AGENTS.md`, `PROJECT_PLAN.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `PR_PLAN.md` e ADRs relevantes;
+1. ler `AGENTS.md`, `CURRENT_STATE.md`, `PROJECT_PLAN.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `PR_PLAN.md`, `docs/development/CRITICAL_PATH.md` e ADRs relevantes;
 2. verificar branch, status, upstream/base SHA e se há trabalho não relacionado;
 3. localizar um único PR card com dependências satisfeitas;
 4. confirmar que a mudança tem artifact real — código, teste, policy executável, workflow, documentação normativa ou fix — e não placeholder;

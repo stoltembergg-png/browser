@@ -41,6 +41,9 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 22. [CURRENT_STATE.md](CURRENT_STATE.md) — snapshot operacional de milestone, wave, blockers e próximo gate.
 23. [docs/development/CRITICAL_PATH.md](docs/development/CRITICAL_PATH.md) — caminho crítico até o MVP e blockers.
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
+25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
+26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.
+27. [docs/LICENSE_POLICY.md](docs/LICENSE_POLICY.md) — política de licença ainda não ratificada.
 
 ## Ordem de leitura
 

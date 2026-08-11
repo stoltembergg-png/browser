@@ -31,12 +31,12 @@ present:
   - CURRENT_STATE.md
   - docs/development/CRITICAL_PATH.md
   - docs/development/EXECUTION_MAP.md
+  - CONTRIBUTING.md
+  - SECURITY.md
+  - CODE_OF_CONDUCT.md
+  - docs/LICENSE_POLICY.md
 
 planned:
-  - path: CONTRIBUTING.md
-    owner_pr: PR-001/003
-  - path: SECURITY.md
-    owner_pr: PR-001/048
   - path: DEVELOPMENT.md
     owner_pr: PR-004/005
   - path: TESTING.md

@@ -9,9 +9,9 @@
 - **Modo:** MATERIALIZATION / PLANNING-ONLY.
 - **Objetivo atual:** transformar `ROADMAP.md` e `PR_PLAN.md` em milestones, Issues, labels, contratos de Draft PR e documentação operacional no GitHub.
 - **Produto:** nenhum código de navegador implementado.
-- **Repository:** ainda não há `origin` nem repositório remoto neste snapshot.
-- **Issues:** ainda não materializadas neste snapshot.
-- **Draft PRs:** ainda não materializadas neste snapshot.
+- **Repository:** `stoltembergg-png/browser`, branch `docs/pr-001-repository-governance`, base `b6cfede…`.
+- **Issues:** 70 materializadas; `PR-001`→`#1` até `PR-070`→`#70` (`docs/development/github-issue-map.json`).
+- **Draft PRs:** Wave 001 em abertura; números serão registrados após criação.
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
 - **Control-plane:** `UNVERIFIED`; sem merge/release automático.
 
