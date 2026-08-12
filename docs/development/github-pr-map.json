@@ -1,0 +1,45 @@
+{
+  "snapshot_at": "2026-08-11T23:27:32Z",
+  "source": "GitHub API live query before this snapshot commit",
+  "authority": "GitHub live state, not this file",
+  "notes": "verified_parent_head_sha is the verified parent head used for this snapshot. A snapshot committed into the same PR cannot self-prove its own new head; live GitHub state remains authoritative.",
+  "PR-001": {
+    "issue": 1,
+    "draft_pr": 71,
+    "branch": "docs/pr-001-repository-governance",
+    "verified_parent_head_sha": "0bf0566076db25800c34959618a479227c95dc31",
+    "base_sha": "b6cfeded652ddfff353d066402b8adb6f29842d4",
+    "tree_sha": "92be29cd8196bdc328b3a3e7e9d5f93b322222d3",
+    "checks": 0,
+    "reviews": 0,
+    "state": "OPEN_DRAFT"
+  },
+  "PR-002": {
+    "issue": 2,
+    "draft_pr": 72,
+    "branch": "docs/pr-002-adr-spec-templates",
+    "verified_parent_head_sha": "fda370ee88d0f432c246cc53c297a66b85fa31be",
+    "state": "OPEN_DRAFT"
+  },
+  "PR-003": {
+    "issue": 3,
+    "draft_pr": 73,
+    "branch": "docs/pr-003-policy-contracts",
+    "verified_parent_head_sha": "57ff144c784764c60c352a05ed56e5211148c78a",
+    "state": "OPEN_DRAFT"
+  },
+  "PR-004": {
+    "issue": 4,
+    "draft_pr": 74,
+    "branch": "docs/pr-004-workspace-contract",
+    "verified_parent_head_sha": "ae6c619a88e51fb856bd58d2199666d49d945b9c",
+    "state": "OPEN_DRAFT"
+  },
+  "PR-005": {
+    "issue": 5,
+    "draft_pr": 75,
+    "branch": "docs/pr-005-dependency-policy",
+    "verified_parent_head_sha": "20f03733935744d467147bdc59de52112444fd70",
+    "state": "OPEN_DRAFT"
+  }
+}

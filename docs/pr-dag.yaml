@@ -146,6 +146,7 @@ nodes:
     dependencies:
       - PR-004
       - PR-007
+      - PR-010
     parallel: true
     risk: 'médio'
     result: 'app shell'

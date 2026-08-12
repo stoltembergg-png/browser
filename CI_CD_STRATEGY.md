@@ -103,6 +103,8 @@ O agregador:
 - branch up to date ou Merge Queue comprovada;
 - conversations resolvidas;
 - rules/workflows/CODEOWNERS protegidos por review apropriado;
+- review policy deve ser explícita: aprovação de autor, bot ou agente não conta; aprovação stale é descartada; qualquer novo commit invalida a elegibilidade anterior; paths cobertos por CODEOWNER exigem aprovação humana elegível quando essa capacidade existir;
+- este repositório solo adota `zero approvals` como política operacional proposta; ela só se torna efetiva após ratificação por ADR/Ruleset. Não simular aprovação com bot. Mesmo com zero approvals, Quality Gate determinístico, segurança, testes e identidade exata continuam obrigatórios;
 - bypass vazio para operação normal; break-glass separado, temporário e auditado;
 - signed commits exigidos somente se os atores de automação suportarem a regra sem deadlock; essa condição nunca relaxa assinatura de artefato, provenance, attestation ou verificação de publicação;
 - branch deletion automática apenas após merge e policy explícita.
@@ -148,6 +150,8 @@ Os controles não entram como um mega-gate no primeiro bootstrap. A ordem mínim
 4. Somente quando os checks forem rápidos, estáveis e autenticados: required check efetivo, canário de bypass e Merge Queue/native Auto-Merge em `ENFORCED`.
 
 WPT amplo, performance budgets, fuzz/soak e matrizes caras permanecem lanes versionadas até possuírem baseline, owner, duração e política de regressão. Isso não relaxa segurança: capability/CSP lint, negative IPC, dependency policy e integrity checks continuam bloqueantes quando aplicáveis.
+
+Comparative performance budgets podem permanecer informativos antes de ADR; safety floors não. Desde M2, bounded queue admission, command timeout, frame/input progress, shutdown boundedness, ausência de starvation sob carga mínima e falha explícita de watchdog são gates bloqueantes quando aplicáveis.
 
 ## 8. Matrix de execução
 

@@ -126,6 +126,11 @@ MVP:
     - explicit_crash_state
     - privileged_ui_boundary_fixture_and_negative_ipc
     - capability_csp_policy_lint
+    - bounded_queue_admission_and_timeout_safety
+    - shutdown_progress_watchdog
+    - frame_input_progress_watchdog
+    - no_starvation_under_minimum_load
+    - extensions_disabled_and_unactivatable
   forbidden_claims:
     - production_browser
     - sandbox
@@ -144,6 +149,10 @@ Alpha:
     - signed_artifact_sbom_provenance
     - artifact_attestation_identity_verified
     - known_risk_register
+  known_risk_register_schema:
+    required_fields: [risk_id, owner, decision, affected_scope, forbidden_claims, mitigation, expiry, revocation_condition]
+    allowed_decisions: [accept, reject, defer]
+    missing_field_result: NO_GO
   forbidden_claims:
     - stable_security_boundary
     - complete_web_compatibility

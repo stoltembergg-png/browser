@@ -102,7 +102,7 @@ Parallelismo é permitido apenas quando não há contrato semântico compartilha
 
 ### Alpha gate
 
-M0–M6 verdes conforme `docs/gates/release-gates.yaml`; MVP + tabs/sessions/profiles/history/bookmarks/downloads/permissions; WPT baseline; security regression suite; signed alpha; crash diagnostics; open high risks list.
+M0–M6 verdes conforme `docs/gates/release-gates.yaml`; MVP + tabs/sessions/profiles/history/bookmarks/downloads/permissions; WPT baseline; security regression suite; signed alpha; crash diagnostics; known-risk register with owner, decision, scope, mitigation, expiry and revocation condition.
 
 ### Beta gate
 
