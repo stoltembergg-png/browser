@@ -60,7 +60,7 @@ planned:
   - path: CHANGELOG.md
     owner_pr: release-process
   - path: docs/decisions/ADR-001.md
-    owner_pr: PR-013/014
+    owner_pr: PR-005/013/014
   - path: docs/decisions/ADR-002.md
     owner_pr: PR-014
   - path: docs/decisions/ADR-003.md

@@ -2,13 +2,13 @@
 
 ## Estado
 
-Este repositório ainda não contém `Cargo.toml`, runtime code ou product dependencies. Esta policy prepara o bootstrap; não é um inventário nem prova de resolução de dependências.
+O workspace M0 contém `Cargo.toml` e `Cargo.lock`, mas ainda não possui dependências externas de produção. Esta policy governa a introdução futura de dependências e a resolução reproduzível atual.
 
 ## Regras
 
 - Preferir stdlib e dependências maduras, pequenas e necessárias.
 - Toda dependência deve declarar função, owner, licença, source, versão/pin, manutenção, advisories conhecidos, alternativa e custo de remoção.
-- `Cargo.lock` será versionado quando houver workspace executável; builds e CI usarão resolução locked.
+- `Cargo.lock` é versionado; builds e CI usam resolução locked (`--locked`).
 - Não usar tags mutáveis como prova de supply chain; revisões, checksums e source devem ser verificáveis.
 - Dependências de produção não podem importar `test-support`, fixtures, ferramentas de desenvolvimento ou secrets.
 - Servo/Tauri e patches locais exigirão revisão específica, source/revision, licença, build evidence e rollback.
@@ -20,7 +20,7 @@ O gate futuro deve verificar advisories, licenças permitidas/proibidas, sources
 
 ## Toolchain e MSRV
 
-A revisão do toolchain, edition, resolver, MSRV e matriz Windows/Linux/macOS será ratificada em ADR-001 após o workspace mínimo e a evidência de runners. Não declarar suporte de OS apenas por intenção documental.
+O bootstrap fixa Rust `1.97.1`, edition `2021`, resolver `2`, perfil minimal e os componentes `rustfmt`/`clippy` em `rust-toolchain.toml`. A matriz Windows/Linux/macOS e o MSRV formal serão ratificados após evidência de runners; não declarar suporte de OS apenas por intenção documental.
 
 ## Atualização e rollback
 
@@ -28,4 +28,4 @@ Atualizações devem ser pequenas, reproduzíveis e acompanhadas de changelog/ad
 
 ## Escopo excluído
 
-Esta policy não autoriza adicionar dependências, implementar o workspace, configurar CI ou escolher uma licença final.
+Esta policy não autoriza adicionar dependências de produto, configurar CI ou escolher uma licença final. O bootstrap do workspace já foi entregue pela PR-004.
