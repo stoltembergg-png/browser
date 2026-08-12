@@ -264,7 +264,7 @@ flowchart TD
 - **Objective:** aggregator fail-closed, evidence identity manifest e binding controlado ao check required.
 - **Dependencies:** 007–009. **Parallel:** não.
 - **Scope:** missing/stale/skipped/malformed/wrong-SHA/merge_group cases; bootstrap OFF/SHADOW/ENFORCED fica documentado e não pode ser inferido localmente. **Out:** IA como authority, Ruleset autodeclarado.
-- **Tests/AC:** matriz adversarial completa verde no sucesso e vermelha em cada caso inválido; canário de check ausente e wrong-SHA permanece bloqueante.
+- **Tests/AC:** matriz adversarial completa verde no sucesso e vermelha em cada caso inválido; manifest fail-closed valida identidade de evidência; canário de check ausente e wrong-SHA permanece bloqueante e explicitamente não é inferido localmente.
 - **Risks/Rollback:** alto; rollback para versão anterior somente com Ruleset canário e auditoria.
 - **Docs:** CI_CD_STRATEGY, gate schema, `docs/ci/control-plane-runbook.md`.
 

@@ -64,3 +64,9 @@ jobs:
 
       - name: Check architecture graph
         run: cargo run -p xtask --locked -- architecture-check
+
+      - name: Check quality-gate evidence manifest
+        run: python3 scripts/quality_gate_check.py
+
+      - name: Check quality-gate manifest tests
+        run: python3 -m unittest -v tests/test_quality_gate_check.py
