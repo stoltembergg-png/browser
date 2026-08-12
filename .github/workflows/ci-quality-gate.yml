@@ -55,3 +55,9 @@ jobs:
 
       - name: Check documentation tests
         run: python3 -m unittest -v tests/test_documentation_check.py
+
+      - name: Run security baseline tests
+        run: python3 -m unittest -v tests/test_security_check.py
+
+      - name: Check security baseline
+        run: python3 scripts/security_check.py
