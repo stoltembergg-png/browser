@@ -34,7 +34,7 @@ Cada item precisa de Definition of Ready, Issue estruturada, ownership exclusivo
 | `PR-001` | #1 | #71 | `docs/pr-001-repository-governance` | `0bf0566076db25800c34959618a479227c95dc31` |
 | `PR-002` | #2 | #72 | `docs/pr-002-adr-spec-templates` | `fda370ee88d0f432c246cc53c297a66b85fa31be` |
 | `PR-003` | #3 | #73 | `docs/pr-003-policy-contracts` | `57ff144c784764c60c352a05ed56e5211148c78a` |
-| `PR-004` | #4 | #74 | `docs/pr-004-workspace-contract` | `ae6c619a88e51fb856bd58d2199666d49d945b9c` |
+| `PR-004` | #4 | #74 | `docs/pr-004-workspace-contract` | `4658b2e3b07ecdb8d2618b443b7335f615ae8a1e` |
 | `PR-005` | #5 | #75 | `docs/pr-005-dependency-policy` | `20f03733935744d467147bdc59de52112444fd70` |
 
 ## Paralelismo

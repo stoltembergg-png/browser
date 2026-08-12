@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — estado operacional
 
-> Snapshot operacional: 2026-08-12T12:00:00Z; confirmar SHA/PR após push.
+> Snapshot operacional: 2026-08-12T12:00:00Z; confirmado após validação local no head `4658b2e3b07ecdb8d2618b443b7335f615ae8a1e`.
 > Este arquivo é operacional, não uma fonte de decisão arquitetural. Após cada mudança de Issues/Draft PRs/milestones, atualize-o ou gere uma nova versão vinculada ao SHA.
 
 ## Estado atual
@@ -9,7 +9,7 @@
 - **Modo:** IMPLEMENTATION / M0 BOOTSTRAP.
 - **Objetivo atual:** transformar `ROADMAP.md` e `PR_PLAN.md` em milestones, Issues, labels, contratos de Draft PR e documentação operacional no GitHub.
 - **Produto:** bootstrap Cargo M0 implementado; nenhum comportamento de navegador ainda.
-- **Repository:** `stoltembergg-png/browser`, branch de estado `docs/pr-001-repository-governance`, base `b6cfede…`.
+- **Repository:** `stoltembergg-png/browser`, branch de estado `docs/pr-004-workspace-contract`, base `b6cfede…`, head `4658b2e…`.
 - **Issues:** 70 materializadas; `PR-001`→`#1` até `PR-070`→`#70` (`docs/development/github-issue-map.json`).
 - **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas snapshots de parent verificado (`docs/development/github-pr-map.json`).
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
@@ -23,7 +23,7 @@
 
 ## Issues in progress
 
-- `#4` / `PR-004` — Rust workspace skeleton; workspace implementado localmente, aguardando push/validação remota.
+- `#4` / `PR-004` — Rust workspace skeleton; Draft PR `#74` atualizada no head remoto e validação local concluída.
 
 ## Ready / Wave 001
 
@@ -51,4 +51,4 @@ Bootstrap Rust M0 implementado localmente: `Cargo.toml`, `Cargo.lock`, cinco pac
 
 ## Próximo gate
 
-Push e validação remota da Draft PR `#74` / `PR-004`; depois avançar para PR-005 e CI conforme o DAG.
+Monitorar a Draft PR `#74` / `PR-004`; não avançar para PR-005 até a dependência/estado de #4 ser verificada e o WIP permanecer em 1.
