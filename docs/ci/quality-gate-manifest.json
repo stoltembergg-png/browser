@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "check_name": "CI / Quality Gate",
+  "status_model": ["UNVERIFIED", "OFF", "SHADOW", "ENFORCED"],
+  "fail_closed": true,
+  "events": ["pull_request", "push", "merge_group"],
+  "required_steps": [
+    "Verify locked metadata",
+    "Check formatting",
+    "Check workspace",
+    "Run tests",
+    "Run Clippy",
+    "Build rustdoc",
+    "Check documentation authority",
+    "Check documentation tests",
+    "Run security baseline tests",
+    "Check security baseline",
+    "Check architecture graph"
+  ],
+  "evidence_fields": [
+    "repository",
+    "event",
+    "base_sha",
+    "head_sha",
+    "tree_sha",
+    "run_id",
+    "attempt",
+    "workflow_revision",
+    "status",
+    "steps"
+  ]
+}

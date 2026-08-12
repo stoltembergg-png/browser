@@ -29,6 +29,10 @@ Sem repositório Git e sem snapshot autenticado, o estado é `UNVERIFIED`, nunca
 
 Imediatamente antes de auto-merge/queue, um evaluator protegido revalida repository, PR, base/head/tree, event, run/attempt, producer identities, policy/evaluator revision, required checks, reviews humanas elegíveis, conversations, mergeability e Ruleset efetivo. Mudança em workflow, evaluator, manifest, policy, CODEOWNERS, permissions, engine revision ou base invalida a elegibilidade anterior.
 
+## Checked-in evidence contract
+
+`docs/ci/quality-gate-manifest.json` is the versioned shape for evidence identity and required deterministic steps. `scripts/quality_gate_check.py` validates the manifest locally and in CI. This proves that the repository contract is present and fail-closed; it does **not** prove that GitHub required-check enforcement is active. That claim still requires an authenticated snapshot and negative canaries.
+
 ## Kill switch e rollback
 
 O runbook de emergência deve poder, fora do fluxo de PR:

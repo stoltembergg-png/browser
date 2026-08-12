@@ -18,6 +18,7 @@ pull_request / push main / merge_group
     ├── fmt/lint/rustdoc/docs/architecture
     ├── unit + integration
     ├── security/dependency/supply chain (baseline in PR-008)
+    ├── evidence identity / quality-gate manifest
     ├── build + platform smoke
     ├── E2E/WPT applicability
     └── bounded producer attestations
