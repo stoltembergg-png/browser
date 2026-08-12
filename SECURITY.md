@@ -41,3 +41,7 @@ Não serão aceitos bypasses de CI, permissões amplas, segredos em workflows ou
 ## Fontes normativas
 
 `SECURITY_MODEL.md`, `THREAT_MODEL.md`, `CI_CD_STRATEGY.md`, `RELEASE_STRATEGY.md`, `docs/gates/release-gates.yaml` e `AI_AGENT_GOVERNANCE.md` são as fontes locais. Em conflito, siga a autoridade documental registrada em `docs/document-authority.yaml` e abra ADR quando necessário.
+
+## M0 executable baseline
+
+The CI quality gate runs `scripts/security_check.py` and its standard-library tests. The baseline fails closed when `Cargo.lock` is absent, a Git source is declared in the lockfile, or secret-like material is present in tracked text. This is not a vulnerability scanner or a substitute for the future dependency/security gate; it is a small executable trust-path control.

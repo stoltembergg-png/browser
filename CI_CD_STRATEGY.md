@@ -17,7 +17,7 @@ pull_request / push main / merge_group
     ├── toolchain + locked dependency resolution
     ├── fmt/lint/rustdoc/docs/architecture
     ├── unit + integration
-    ├── security/dependency/supply chain
+    ├── security/dependency/supply chain (baseline in PR-008)
     ├── build + platform smoke
     ├── E2E/WPT applicability
     └── bounded producer attestations
