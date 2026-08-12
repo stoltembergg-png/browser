@@ -37,6 +37,7 @@
 | `.github/ISSUE_TEMPLATE/` | PR-003 | formulários de feature, bug, security e architecture | YAML/schema checker |
 | `docs/development/GITHUB_LABELS.md` | PR-003 | taxonomia ortogonal de labels | GitHub snapshot |
 | `docs/security/GITHUB_ACTIONS_SECURITY.md` | PR-003/006 | pinning, permissions, forks, secrets, artifacts e rollout | CI/security checker |
+| `docs/contracts/workspace-contract.md` | PR-004 | packages/edges planejados e invariantes do workspace | `cargo metadata` futuro |
 
 ## O que não deve entrar no repositório
 
