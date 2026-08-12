@@ -59,6 +59,10 @@ O nível de teste é definido por `TESTING_STRATEGY.md` e pelo card. Para docume
 
 Nenhum agente ou modelo é reviewer, CODEOWNER, required check, bypass actor ou autoridade de merge. IA pode resumir logs, mas não aprova, altera Rulesets, publica artefatos ou relaxa gates. Releases devem reutilizar o artefato construído, testado, assinado e atestado; Stable permanece bloqueado até os gates de M8.
 
+### Modo de mantenedor autônomo
+
+Este repositório opera com um único mantenedor e não terá intervenções humanas adicionais. A política de revisão é, portanto, `zero approvals`, sem simular aprovação humana: nenhum bot, LLM ou agente será reviewer, CODEOWNER, required reviewer ou bypass actor. A ausência de aprovação só pode ser aceita quando o Ruleset/ADR correspondente estiver efetivamente ratificado; até lá, o estado permanece `UNVERIFIED`/`NO_GO`. O Quality Gate determinístico, a validação de segurança, os testes, a identidade exata de SHA/tree e a política de dependências continuam obrigatórios e não podem ser relaxados.
+
 ## Security reporting
 
 Vulnerabilidades não devem ser abertas em Issue pública. Use GitHub Security Advisories quando habilitado; se o canal privado ainda não estiver habilitado, pare e registre o blocker sem publicar detalhes exploráveis. Consulte `SECURITY.md`.

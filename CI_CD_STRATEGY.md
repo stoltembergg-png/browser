@@ -104,7 +104,7 @@ O agregador:
 - conversations resolvidas;
 - rules/workflows/CODEOWNERS protegidos por review apropriado;
 - review policy deve ser explícita: aprovação de autor, bot ou agente não conta; aprovação stale é descartada; qualquer novo commit invalida a elegibilidade anterior; paths cobertos por CODEOWNER exigem aprovação humana elegível quando essa capacidade existir;
-- se não houver segundo humano elegível no repositório solo, não simular aprovação com bot: usar a política de zero approvals somente quando ratificada por ADR/Ruleset, mantendo o Quality Gate determinístico como autoridade técnica;
+- este repositório solo adota `zero approvals` como política operacional proposta; ela só se torna efetiva após ratificação por ADR/Ruleset. Não simular aprovação com bot. Mesmo com zero approvals, Quality Gate determinístico, segurança, testes e identidade exata continuam obrigatórios;
 - bypass vazio para operação normal; break-glass separado, temporário e auditado;
 - signed commits exigidos somente se os atores de automação suportarem a regra sem deadlock; essa condição nunca relaxa assinatura de artefato, provenance, attestation ou verificação de publicação;
 - branch deletion automática apenas após merge e policy explícita.

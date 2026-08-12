@@ -80,7 +80,7 @@ ler AGENTS.md/CURRENT_STATE.md
 → executar testes locais reais
 → push e aguardar CI do SHA atual
 → corrigir falhas sem relaxar gate
-→ review humano/CODEOWNER
+→ revisão conforme política de mantenedor (`zero approvals` ratificada) ou review humano/CODEOWNER quando aplicável
 → merge protegido somente quando elegível
 ```
 
@@ -121,7 +121,7 @@ Delegação só ocorre para tarefas independentes, com contexto completo e outpu
 - reconcilie contra o DAG e TODO atual;
 - descarte conclusões stale ou fora de escopo.
 
-Agentes não criam PRs/merges concorrentes na mesma branch sem ownership explícito. Nenhum agente filho agenda cron recursivo, altera regras de outro ambiente ou trata aprovação humana/IA como quality gate. Bots e LLMs são proibidos de ser CODEOWNERS, required reviewers ou bypass actors; o control-plane só muda de `OFF` para `SHADOW`/`ENFORCED` por bootstrap autenticado e canarizado.
+Agentes não criam PRs/merges concorrentes na mesma branch sem ownership explícito. Nenhum agente filho agenda cron recursivo, altera regras de outro ambiente ou trata aprovação humana/IA como quality gate. Em repositório solo, `zero approvals` pode ser política explícita, mas só após ratificação por ADR/Ruleset; Quality Gate, segurança, testes e identidade SHA/tree continuam obrigatórios. Bots e LLMs permanecem proibidos como CODEOWNERS, required reviewers ou bypass actors.
 
 ## 9. AI in CI
 
