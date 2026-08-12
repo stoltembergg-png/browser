@@ -46,3 +46,12 @@ jobs:
 
       - name: Run Clippy
         run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+
+      - name: Build rustdoc
+        run: cargo doc --workspace --no-deps --locked
+
+      - name: Check documentation authority
+        run: python3 scripts/documentation_check.py
+
+      - name: Check documentation tests
+        run: python3 -m unittest -v tests/test_documentation_check.py

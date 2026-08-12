@@ -15,7 +15,7 @@ pull_request / push main / merge_group
   `CI / Quality Gate (required after authenticated bootstrap)`
     ├── PR metadata/spec policy
     ├── toolchain + locked dependency resolution
-    ├── fmt/lint/docs/architecture
+    ├── fmt/lint/rustdoc/docs/architecture
     ├── unit + integration
     ├── security/dependency/supply chain
     ├── build + platform smoke
