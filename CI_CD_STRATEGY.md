@@ -12,7 +12,7 @@ GitHub Rulesets oferecem regras e enforcement que deverão ser consultados e can
 pull_request / push main / merge_group
           │
           ▼
-  CI / Quality Gate (required)
+  `CI / Quality Gate (required after authenticated bootstrap)`
     ├── PR metadata/spec policy
     ├── toolchain + locked dependency resolution
     ├── fmt/lint/docs/architecture

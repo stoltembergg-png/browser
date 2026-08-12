@@ -2,7 +2,7 @@
 
 ## Status
 
-This policy is normative for future workflows, but the repository currently has zero workflows and no required checks. The operational control-plane remains `UNVERIFIED`; this document is not evidence that enforcement exists.
+This policy is normative for workflows. The repository now contains the initial `ci-quality-gate.yml` workflow, but no required check has been configured yet. The operational control-plane remains `UNVERIFIED`; this document is not evidence that enforcement exists.
 
 ## Action pinning
 
