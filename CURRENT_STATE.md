@@ -14,7 +14,8 @@
 - **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas snapshots de parent verificado (`docs/development/github-pr-map.json`).
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
 - **Control-plane:** `UNVERIFIED`; sem merge/release automático.
-- **Review policy:** mantenedor autônomo / `zero approvals` proposta; aguardando ratificação efetiva por ADR/Ruleset, sem simular review humano.
+- **Review policy:** mantenedor autônomo / `zero approvals` ratificada pelo Ruleset `autonomous-main-protection` (`20723028`); sem simular review humano.
+- **Ruleset:** ativo em `main`, exige PR, bloqueia deletion/force-push e não exige checks enquanto CI não existir; o control-plane permanece `UNVERIFIED` para merge/release automático.
 
 ## Issues ready
 
