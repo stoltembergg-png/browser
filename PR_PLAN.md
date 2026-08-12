@@ -240,7 +240,7 @@ flowchart TD
 - **Objective:** `cargo fmt --check`, Clippy `-D warnings`, rustdoc e metadata checks.
 - **Dependencies:** 005–006. **Parallel:** sim.
 - **Scope:** static quality. **Out:** domain behavior.
-- **Tests/AC:** intentional failure fixtures bloqueiam; warnings não viram sucesso.
+- **Tests/AC:** intentional failure fixtures bloqueiam; warnings não viram sucesso; `cargo doc --workspace --no-deps` e `scripts/documentation_check.py` passam.
 - **Risks/Rollback:** baixo; corrigir code/policy, não remover lint.
 - **Docs:** DEVELOPMENT/TESTING.
 
