@@ -256,7 +256,7 @@ flowchart TD
 - **Objective:** `xtask architecture-check` comparar `cargo metadata` com `docs/architecture-graph.yaml`, validar packages/edges por fase e detectar ciclos.
 - **Dependencies:** 004–005. **Parallel:** sim.
 - **Scope:** Cargo metadata/graph rules, transition fixtures e package extraction policy. **Out:** runtime behavior.
-- **Tests/AC:** fixture proibida `core→servo-engine`, UI→storage, undeclared package/edge e cycle falham; bootstrap M0 e transição M1 passam somente quando manifest e metadata concordam.
+- **Tests/AC:** fixture proibida `core→servo-engine`, UI→storage, undeclared package/edge e cycle falham; `cargo run -p xtask -- architecture-check` valida o bootstrap M0 contra metadata real.
 - **Risks/Rollback:** médio; corrigir edge ou ADR, nunca desligar checker.
 - **Docs:** ARCHITECTURE, `docs/architecture-graph.yaml`.
 

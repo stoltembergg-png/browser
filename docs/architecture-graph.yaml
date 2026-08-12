@@ -1,7 +1,7 @@
 schema_version: 1
-status: proposed
+status: validated
 authority: ARCHITECTURE.md
-validated_against_cargo_metadata: false
+validated_against_cargo_metadata: true
 validation_command: xtask architecture-check
 
 phases:
