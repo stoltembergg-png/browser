@@ -20,6 +20,8 @@ present:
   - SOURCES.md
   - docs/decisions/README.md
   - docs/decisions/ADR-000-template.md
+  - docs/specs/README.md
+  - docs/specs/SPEC-000-template.md
   - docs/architecture-graph.yaml
   - docs/document-authority.yaml
   - docs/gates/release-gates.yaml
