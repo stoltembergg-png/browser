@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — estado operacional
 
-> Snapshot GitHub da materialização: 2026-08-11T17:45:59-03:00.
+> Snapshot GitHub da materialização: 2026-08-12T00:30:52Z.
 > Este arquivo é operacional, não uma fonte de decisão arquitetural. Após cada mudança de Issues/Draft PRs/milestones, atualize-o ou gere uma nova versão vinculada ao SHA.
 
 ## Estado atual
@@ -11,7 +11,7 @@
 - **Produto:** nenhum código de navegador implementado.
 - **Repository:** `stoltembergg-png/browser`, branch de estado `docs/pr-001-repository-governance`, base `b6cfede…`.
 - **Issues:** 70 materializadas; `PR-001`→`#1` até `PR-070`→`#70` (`docs/development/github-issue-map.json`).
-- **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas last-verified snapshots (`docs/development/github-pr-map.json`).
+- **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas snapshots de parent verificado (`docs/development/github-pr-map.json`).
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
 - **Control-plane:** `UNVERIFIED`; sem merge/release automático.
 
@@ -21,13 +21,13 @@
 
 ## Issues in progress
 
-- Nenhuma Issue foi assumida para implementação.
+- `#1` / `PR-001` — Repository governance; claim operacional ativo, PR #71 em Draft.
 
 ## Ready / Wave 001
 
 A Wave 001 será limitada a cinco contratos de planejamento:
 
-- `PR-001` / Issue `#1` / Draft `#71` — Repository governance;
+- `PR-001` / Issue `#1` / Draft `#71` — Repository governance, em progresso;
 - `PR-002` / Issue `#2` / Draft `#72` — ADR and specification templates;
 - `PR-003` / Issue `#3` / Draft `#73` — PR/CODEOWNERS/policy contracts;
 - `PR-004` / Issue `#4` / Draft `#74` — Rust workspace contract, sem implementação;
