@@ -43,6 +43,21 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
 25. [docs/contracts/workspace-contract.md](docs/contracts/workspace-contract.md) — contrato proposto do bootstrap Cargo, sem implementação.
 
+25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
+26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.
+27. [docs/LICENSE_POLICY.md](docs/LICENSE_POLICY.md) — política de licença ainda não ratificada.
+28. [docs/development/WAVE-001.md](docs/development/WAVE-001.md) — primeira wave e evidence mapping.
+29. [docs/development/github-issue-map.json](docs/development/github-issue-map.json) — IDs estáveis para Issues GitHub.
+30. [docs/development/github-pr-map.json](docs/development/github-pr-map.json) — IDs estáveis para Draft PRs, branches e SHAs.
+31. [docs/development/STATE_SYNC.md](docs/development/STATE_SYNC.md) — estratégia de snapshot/derivação de estado a partir do GitHub.
+32. [docs/agents/HERMES_VPS.md](docs/agents/HERMES_VPS.md) — contrato operacional específico do executor Hermes na VPS; não substitui as fontes normativas.
+33. [docs/specs/README.md](docs/specs/README.md) — regras para especificações e acceptance criteria.
+34. [docs/specs/SPEC-000-template.md](docs/specs/SPEC-000-template.md) — template de specification; não é autoridade.
+35. [.github/pull_request_template.md](.github/pull_request_template.md) — contrato/checklist de PR.
+36. [.github/CODEOWNERS](.github/CODEOWNERS) — ownership do mantenedor nos trust paths.
+37. [docs/development/GITHUB_LABELS.md](docs/development/GITHUB_LABELS.md) — taxonomia de labels semânticas.
+38. [docs/security/GITHUB_ACTIONS_SECURITY.md](docs/security/GITHUB_ACTIONS_SECURITY.md) — policy de Actions, tokens, forks, artifacts e rollout.
+
 ## Ordem de leitura
 
 `PROJECT_PLAN.md` → `ARCHITECTURE.md` → `SECURITY_MODEL.md` → `TESTING_STRATEGY.md` → `CI_CD_STRATEGY.md` → `ROADMAP.md` → `PR_PLAN.md`.

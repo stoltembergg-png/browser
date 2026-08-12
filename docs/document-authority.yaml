@@ -20,6 +20,8 @@ present:
   - SOURCES.md
   - docs/decisions/README.md
   - docs/decisions/ADR-000-template.md
+  - docs/specs/README.md
+  - docs/specs/SPEC-000-template.md
   - docs/architecture-graph.yaml
   - docs/document-authority.yaml
   - docs/gates/release-gates.yaml
@@ -31,13 +33,22 @@ present:
   - CURRENT_STATE.md
   - docs/development/CRITICAL_PATH.md
   - docs/development/EXECUTION_MAP.md
+  - docs/development/WAVE-001.md
+  - docs/development/github-issue-map.json
+  - docs/development/github-pr-map.json
+  - docs/development/STATE_SYNC.md
+  - docs/agents/HERMES_VPS.md
+  - CONTRIBUTING.md
+  - SECURITY.md
+  - CODE_OF_CONDUCT.md
+  - docs/LICENSE_POLICY.md
+  - .github/CODEOWNERS
+  - .github/pull_request_template.md
+  - docs/development/GITHUB_LABELS.md
+  - docs/security/GITHUB_ACTIONS_SECURITY.md
   - docs/contracts/workspace-contract.md
 
 planned:
-  - path: CONTRIBUTING.md
-    owner_pr: PR-001/003
-  - path: SECURITY.md
-    owner_pr: PR-001/048
   - path: DEVELOPMENT.md
     owner_pr: PR-004/005
   - path: TESTING.md

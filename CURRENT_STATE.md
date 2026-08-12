@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — estado operacional
 
-> Snapshot inicial da materialização: 2026-08-11T17:15:07-03:00.
+> Snapshot GitHub da materialização: 2026-08-12T00:30:52Z.
 > Este arquivo é operacional, não uma fonte de decisão arquitetural. Após cada mudança de Issues/Draft PRs/milestones, atualize-o ou gere uma nova versão vinculada ao SHA.
 
 ## Estado atual
@@ -9,36 +9,46 @@
 - **Modo:** MATERIALIZATION / PLANNING-ONLY.
 - **Objetivo atual:** transformar `ROADMAP.md` e `PR_PLAN.md` em milestones, Issues, labels, contratos de Draft PR e documentação operacional no GitHub.
 - **Produto:** nenhum código de navegador implementado.
-- **Repository:** ainda não há `origin` nem repositório remoto neste snapshot.
-- **Issues:** ainda não materializadas neste snapshot.
-- **Draft PRs:** ainda não materializadas neste snapshot.
+- **Repository:** `stoltembergg-png/browser`, branch de estado `docs/pr-001-repository-governance`, base `b6cfede…`.
+- **Issues:** 70 materializadas; `PR-001`→`#1` até `PR-070`→`#70` (`docs/development/github-issue-map.json`).
+- **Draft PRs:** 5 abertas em Draft, `#71`–`#75`; o mapa local contém apenas snapshots de parent verificado (`docs/development/github-pr-map.json`).
 - **Quality Gate:** planejado; nenhum required check deve ser configurado antes de existir e passar por canários.
 - **Control-plane:** `UNVERIFIED`; sem merge/release automático.
+- **Review policy:** mantenedor autônomo / `zero approvals` ratificada pelo Ruleset `autonomous-main-protection` (`20723028`); sem simular review humano.
+- **Ruleset:** ativo em `main`, exige PR, bloqueia deletion/force-push e não exige checks enquanto CI não existir; o control-plane permanece `UNVERIFIED` para merge/release automático.
 
-## Ready / próxima wave
+## Issues ready
+
+- `#1` / `PR-001` — Repository governance.
+
+## Issues in progress
+
+- `#1` / `PR-001` — Repository governance; claim operacional ativo, PR #71 em Draft.
+
+## Ready / Wave 001
 
 A Wave 001 será limitada a cinco contratos de planejamento:
 
-- `PR-001` — Repository governance;
-- `PR-002` — ADR and specification templates;
-- `PR-003` — PR/CODEOWNERS/policy contracts;
-- `PR-004` — Rust workspace skeleton;
-- `PR-005` — Toolchain and dependency policy.
+- `PR-001` / Issue `#1` / Draft `#71` — Repository governance, em progresso;
+- `PR-002` / Issue `#2` / Draft `#72` — ADR and specification templates;
+- `PR-003` / Issue `#3` / Draft `#73` — PR/CODEOWNERS/policy contracts;
+- `PR-004` / Issue `#4` / Draft `#74` — Rust workspace contract, sem implementação;
+- `PR-005` / Issue `#5` / Draft `#75` — Toolchain and dependency policy.
 
 As Draft PRs podem ser abertas antes do merge de suas predecessoras para tornar o DAG visível, mas devem declarar `Depends on`/`Blocked until` e não são merge-eligible por isso.
 
 ## Blockers
 
-- repository/remote alvo ainda não definido no baseline local;
-- `CONTRIBUTING.md`, `SECURITY.md`, templates e `CODEOWNERS` são entregáveis planejados de M0, não evidência presente;
+- Draft PRs dependentes ainda não podem ser mergeadas fora da ordem declarada;
+- Nenhum workflow executável/required check existe; Rulesets e branch protection permanecem ausentes;
 - ADRs de produto ainda são propostas;
 - CI/Rulesets/required checks e canários GitHub ainda não foram executados;
 - PRs futuras que implementam Rust/Tauri/Servo continuam fora desta execução.
 
 ## Último estágio concluído
 
-Planejamento mestre revisado: 70 unidades `PR-001`–`PR-070`, DAG sem dependências ausentes/ciclos, gates de segurança/release documentados e contratos machine-readable presentes.
+Planejamento mestre revisado e materialização inicial publicada: 70 unidades `PR-001`–`PR-070`, DAG sem dependências ausentes/ciclos, gates de segurança/release documentados, contratos machine-readable presentes e 5 Draft PRs abertas.
 
 ## Próximo gate
 
-Bootstrap remoto autenticado, criação idempotente de milestones/labels/Issues, abertura de no máximo 5–10 Draft PRs planning-only e atualização deste arquivo com os números reais do GitHub.
+Review e validação da Draft PR `#71` / `PR-001`; somente depois resolver a cadeia `#72`→`#73` e `#74`→`#75`. Não iniciar implementação de Rust/browser nesta execução.

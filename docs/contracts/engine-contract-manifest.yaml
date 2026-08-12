@@ -1,6 +1,6 @@
 schema_version: 1
 status: proposed
-authority: ADR-004
+authority: PR-015 provisional contract; ADR-004 ratification required before PR-020/021/025/026
 source_of_truth: TESTING_STRATEGY.md
 validation_command: xtask engine-contract-check
 validated_against_runtime: false

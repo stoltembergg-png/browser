@@ -90,6 +90,8 @@ A UI Tauri usa snapshots por OS, escala, fonte e tema em fixtures determinístic
 
 O primeiro benchmark mede; não inventa budget. PR-055 cria manifest com cenários e registra p50/p95, cauda, memória inicial, memória por tab, startup cold/warm, nova tab, navigation fixture, frame responsiveness e shutdown. O baseline inclui hardware/OS/engine revision/feature flags, warmup, número de amostras, ruído permitido e comparação somente com baseline do mesmo OS/engine/flags.
 
+O manifest também deve fixar workload/fixture hash, runner e método de captura, repetições independentes, política de outliers/variância, intervalo ou regra de decisão estatística e critérios de invalidação. Atualizar baseline exige revisão do manifest, justificativa, nova identidade de engine/OS/flags quando aplicável e uma regressão sintética conhecida que falhe no comparador; um p95 isolado não ratifica budget.
+
 Depois de dados suficientes, um ADR define budgets por cenário e tolerância de regressão. Antes disso, performance é artifact informativo para PR, mas ausência de baseline bloqueia Beta/Stable; não há número arbitrário. Release bloqueia regressão contra o budget vigente, falha/ausência de dados e regressão não triada, e exige que mudança de engine/pipeline atualize o baseline com justificativa.
 
 ## 6. Stress, fuzz e soak
@@ -144,6 +146,8 @@ result counts, skipped/notrun counts, artifact digest, run id/attempt
 ```
 
 Resultados de A ficam inválidos quando B muda o head, tree, policy, workflow evaluator ou engine revision. A pipeline deve publicar falhas e logs redigidos sem PII/secrets.
+
+Safety floors de lifecycle não aguardam a ratificação de budgets: queue saturation/admission, command timeout, frame/input progress, bounded shutdown, watchdog failure e starvation sob carga mínima devem possuir casos negativos bloqueantes desde M2. Ausência, skip, no-run ou ausência de progresso é `NO_GO`.
 
 ## 10. Matriz de execução
 
