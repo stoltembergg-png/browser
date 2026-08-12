@@ -1,0 +1,65 @@
+name: Feature request
+description: Propose a capability that is already supported by the roadmap and architecture.
+title: "[Feature] "
+labels:
+  - type:feature
+  - status:ready
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check `PROJECT_PLAN.md`, `ROADMAP.md`, `PR_PLAN.md` and `CURRENT_STATE.md` first. Do not include secrets or private browsing data.
+  - type: input
+    id: plan_id
+    attributes:
+      label: Stable plan ID
+      description: PR-xxx or an explicit roadmap item. New architecture needs an ADR first.
+      placeholder: PR-000
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why does this exist and which user/problem does it address?
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective and scope
+      description: State one verifiable outcome and the boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: out_of_scope
+    attributes:
+      label: Out of scope
+      description: Explicitly list what must not be implemented.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and ADRs
+      description: Link predecessor Issues and identify decisions that must be accepted.
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing and acceptance criteria
+      description: Include positive, negative, security and recovery evidence.
+    validations:
+      required: true
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Definition of Ready
+      options:
+        - label: I checked for duplicate Issues and exclusive ownership.
+          required: true
+        - label: The proposal does not claim unproven sandbox, site isolation, compatibility or performance.
+          required: true
+        - label: No secrets, credentials, private URLs or user data are included.
+          required: true

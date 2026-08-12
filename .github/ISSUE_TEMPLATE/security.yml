@@ -1,0 +1,38 @@
+name: Security report
+description: Route a suspected vulnerability to the private security process.
+title: "[Security] Private follow-up required"
+labels:
+  - area:security
+  - type:security
+  - risk:high
+  - status:blocked
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not disclose vulnerability details here. This public form is only an administrative pointer. Follow `SECURITY.md` and use GitHub Security Advisories when enabled. If the private channel is unavailable, do not post exploit material.
+  - type: textarea
+    id: administrative_context
+    attributes:
+      label: Redacted administrative context
+      description: Describe only affected high-level area and whether private reporting was attempted. No exploit steps, payloads, secrets or user data.
+    validations:
+      required: true
+  - type: input
+    id: affected_version
+    attributes:
+      label: Affected version or commit
+      description: Use public version/SHA only; omit private deployment identifiers.
+    validations:
+      required: true
+  - type: checkboxes
+    id: routing
+    attributes:
+      label: Routing confirmation
+      options:
+        - label: I did not include exploit details, credentials, tokens, PII or private URLs.
+          required: true
+        - label: I will move technical details to a private Security Advisory.
+          required: true
+        - label: If private reporting is unavailable, I will leave the issue blocked rather than disclose details publicly.
+          required: true

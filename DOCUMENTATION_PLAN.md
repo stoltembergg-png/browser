@@ -32,6 +32,11 @@
 | `docs/development/github-issue-map.json` | materialization/operations | ID estável → Issue number | GitHub API snapshot |
 | `docs/development/github-pr-map.json` | materialization/operations | ID estável → Draft PR/branch/last-verified head SHA | GitHub API + git |
 | `docs/development/STATE_SYNC.md` | materialization/operations | estratégia de geração/reconciliação de estado | GitHub API + future state-sync workflow |
+| `.github/CODEOWNERS` | PR-003 | ownership humano dos trust paths | policy checker |
+| `.github/pull_request_template.md` | PR-003 | contrato e checklist de PR | policy checker |
+| `.github/ISSUE_TEMPLATE/` | PR-003 | formulários de feature, bug, security e architecture | YAML/schema checker |
+| `docs/development/GITHUB_LABELS.md` | PR-003 | taxonomia ortogonal de labels | GitHub snapshot |
+| `docs/security/GITHUB_ACTIONS_SECURITY.md` | PR-003/006 | pinning, permissions, forks, secrets, artifacts e rollout | CI/security checker |
 
 ## O que não deve entrar no repositório
 
