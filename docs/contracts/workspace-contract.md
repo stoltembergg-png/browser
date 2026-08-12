@@ -1,6 +1,6 @@
 # Workspace contract — PR-004
 
-> Status: proposed contract only. This file does not create a Cargo workspace or implement browser behavior.
+> Status: implemented M0 bootstrap. This workspace contains only compilable package scaffolding; it does not implement browser behavior.
 
 ## Objective
 
@@ -19,16 +19,19 @@ Define the smallest compilable workspace that later PR-004 implementation must c
 ## Invariants
 
 - Cargo package names and dependency edges must agree with `docs/architecture-graph.yaml`.
+- The implemented M0 workspace has exactly five members: `browser-domain`, `browser-core`, `engine-api`, `test-support` and `xtask`.
 - `browser-core` must not depend on `servo-engine` or Servo types.
 - `engine-api` is an internal SPI, not a public plugin/registry API.
 - `test-support` cannot be included in release/runtime dependency closure.
 - Workspace resolver, edition and MSRV are selected by the accepted toolchain policy, not guessed in this contract.
 - No `unsafe`, `unwrap`, `expect` or `panic!` in domain/core/security/storage without the policy/justification required by the plan.
 
-## Acceptance evidence for the future implementation
+## Acceptance evidence
 
-- `cargo metadata --locked` identifies exactly the intended packages.
-- `cargo check --workspace` passes from a clean checkout.
+- `cargo metadata --locked` identifies exactly the intended packages. **PASS** on the implementation SHA.
+- `cargo check --workspace` passes from a clean checkout. **PASS** on the implementation SHA.
+- `cargo fmt --all -- --check` passes. **PASS** on the implementation SHA.
+- `cargo test --workspace` passes with four unit tests. **PASS** on the implementation SHA.
 - architecture validator agrees with package/edge manifest.
 - forbidden-edge fixtures fail closed.
 - package list and resolver are reproducible on the supported reference runner.

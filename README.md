@@ -1,6 +1,6 @@
 # Browser Planning Workspace
 
-Este diretório contém apenas o planejamento e os contratos de governança de um navegador open source multiplataforma em Rust, com Tauri como shell e Servo como engine web inicial.
+Este diretório contém a fundação executável e os contratos de governança de um navegador open source multiplataforma em Rust, com Tauri como shell e Servo como engine web inicial.
 
 ## Escopo desta entrega
 
@@ -13,7 +13,7 @@ Este diretório contém apenas o planejamento e os contratos de governança de u
 - governança para agentes de IA;
 - roadmap e DAG de Pull Requests pequenas.
 
-Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o baseline documental e a esteira de materialização; o estado operacional atual de Issues, Draft PRs, milestones e blockers vive em `CURRENT_STATE.md`. Enforcement externo só é considerado verificado após consulta autenticada ao GitHub.
+O bootstrap Cargo M0 foi implementado: cinco packages compiláveis, sem comportamento de navegador, Tauri ou Servo. O estado operacional atual de Issues, Draft PRs, milestones e blockers vive em `CURRENT_STATE.md`. Enforcement externo só é considerado verificado após consulta autenticada ao GitHub.
 
 ## Documentos
 
@@ -41,7 +41,7 @@ Nenhuma funcionalidade do navegador foi implementada. Este workspace contém o b
 22. [CURRENT_STATE.md](CURRENT_STATE.md) — snapshot operacional de milestone, wave, blockers e próximo gate.
 23. [docs/development/CRITICAL_PATH.md](docs/development/CRITICAL_PATH.md) — caminho crítico até o MVP e blockers.
 24. [docs/development/EXECUTION_MAP.md](docs/development/EXECUTION_MAP.md) — milestones, Issues, Draft PRs, dependências e gates.
-25. [docs/contracts/workspace-contract.md](docs/contracts/workspace-contract.md) — contrato proposto do bootstrap Cargo, sem implementação.
+25. [docs/contracts/workspace-contract.md](docs/contracts/workspace-contract.md) — contrato e evidência do bootstrap Cargo M0.
 
 25. [CONTRIBUTING.md](CONTRIBUTING.md) — Definition of Ready/Done e fluxo de contribuição.
 26. [SECURITY.md](SECURITY.md) — reporte privado e escopo de segurança por fase.

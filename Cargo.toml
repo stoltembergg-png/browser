@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/browser-domain",
+    "crates/browser-core",
+    "crates/engine-api",
+    "crates/test-support",
+    "xtask",
+]
+
+[workspace.package]
+edition = "2021"
+license = "UNLICENSED"
+version = "0.1.0"
+
+[workspace.dependencies]
+browser-domain = { path = "crates/browser-domain" }
+engine-api = { path = "crates/engine-api" }
