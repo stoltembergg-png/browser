@@ -1,6 +1,6 @@
 # CODEOWNERS
 
-# Human ownership is required for trust paths. Agents/bots are never CODEOWNERS.
+# Maintainer ownership is required for trust paths. Agents/bots are never CODEOWNERS.
 * @stoltembergg-png
 
 /.github/ @stoltembergg-png
