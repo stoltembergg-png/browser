@@ -61,3 +61,6 @@ jobs:
 
       - name: Check security baseline
         run: python3 scripts/security_check.py
+
+      - name: Check architecture graph
+        run: cargo run -p xtask --locked -- architecture-check
