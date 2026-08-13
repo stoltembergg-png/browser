@@ -13,8 +13,8 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 | ID | Boundary/ativo | Ameaça | Impacto | Controle planejado | Teste/gate | Estado |
 |---|---|---|---|---|---|---|
 | TM-001 | página → engine | renderer compromise por conteúdo malicioso | leitura/execução no processo do browser | MVP: risco explicitamente in-process/thread-affine; Stable: engine host separado, launch restrictions e recovery | crash corpus, cross-origin compromise, process isolation ADR, PR-064–066/069–070 | blocker de Stable até evidência |
-| TM-002 | UI → core | spoofed/malformed IPC | comandos privilegiados, filesystem/process | schema, allowlist, capability/window/tab scope, bounded payload | malformed IPC/fuzz | planejado |
-| TM-003 | engine → core | evento stale/falso/unknown | tab errado, grant errado, state corruption | request/event IDs, navigation generation, versioned envelopes | contract negative suite | planejado |
+| TM-002 | UI → core | spoofed/malformed IPC | comandos privilegiados, filesystem/process | schema, allowlist, capability/window/tab scope, bounded payload | malformed IPC/fuzz | PR-024 negative suite; expansão futura |
+| TM-003 | engine → core | evento stale/falso/unknown | tab errado, grant errado, state corruption | request/event IDs, navigation generation, versioned envelopes; PR-028 adiciona epoch fence | contract negative suite; `crash_recovery` stale epoch/generation tests | control implemented; engine artifact still required |
 | TM-004 | página → navigation | scheme/protocol abuse | leitura local, shell/external handler | parser, scheme allowlist, broker, no shell interpolation | URL corpus, `file/data/javascript` cases | planejado |
 | TM-005 | página → download | malicious filename/path | overwrite, traversal, executable delivery | temp root, canonicalization, sanitization, quarantine, atomic rename | OS path corpus, interrupted downloads | planejado |
 | TM-006 | origin A → permission | confused deputy/grant reuse | camera/mic/notification/storage abuse | grant bound to origin/top-level/profile/tab context | cross-origin permission tests | planejado |
@@ -26,8 +26,8 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 | TM-012 | CI PR/fork → workflow | secret exfiltration/command injection | release/GitHub compromise | no secrets in fork, pinned actions, least permissions, no target checkout | hostile PR fixtures, integrity gate | planejado |
 | TM-013 | dependency → build | compromised crate/action | supply-chain backdoor | cargo-deny/audit, lockfile, review, SBOM, provenance, dependency policy | advisory/license/source violations | planejado |
 | TM-014 | extension → core | excessive extension privilege | data exfiltration/automation | extensions out of MVP; manifest/capability/process boundary | extension threat suite | deferred |
-| TM-015 | diagnostics → telemetry | sensitive URL/PII leakage | privacy breach | opt-in, redaction, local-first, field allowlist | redaction unit tests + golden logs | planejado |
-| TM-016 | engine hang/crash | denial/data loss | tab loss/app unavailable | watchdog/timeout, tab-level recovery, atomic session | hang/crash/restart E2E | planejado |
+| TM-015 | diagnostics → telemetry | sensitive URL/PII leakage | privacy breach | fixed `[REDACTED]` detail marker; no raw crash/hang detail retained by recovery policy | `crash_records_redacted_diagnostics_without_raw_detail`; security gate | control implemented; telemetry integration pending |
+| TM-016 | engine hang/crash | denial/data loss | tab loss/app unavailable | watchdog/hang classification, bounded restart attempts, checkpoint retention, epoch/generation fencing, terminal result; no automatic form resubmission | `crash_recovery` crash/hang/restart/abrupt-shutdown tests | control implemented; real engine E2E pending |
 | TM-017 | storage migration | malformed/corrupt profile | data loss/startup failure | versioned schema, transactional migration, backup/recovery | kill-at-each-step/old versions | planejado |
 | TM-018 | external protocol | handler abuse | shell command execution/phishing | explicit allowlist/confirmation/no interpolation | protocol corpus | planejado |
 
