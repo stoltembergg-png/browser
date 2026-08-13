@@ -1,0 +1,12 @@
+[package]
+name = "browser-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "2.2.0" }
+
+[dependencies]
+tauri.workspace = true

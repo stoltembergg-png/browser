@@ -18,6 +18,7 @@ phases:
       xtask: []
   M1:
     adds:
+      - browser-desktop
       - platform
       - render-surface
       - servo-engine

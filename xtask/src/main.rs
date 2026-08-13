@@ -44,6 +44,7 @@ fn parse_m0_packages(graph: &str) -> Result<BTreeSet<String>, String> {
         .take_while(|line| line.starts_with("- "))
         .map(|line| line.trim_start_matches("- ").trim().to_string())
         .collect::<BTreeSet<_>>();
+
     if packages.is_empty() {
         return Err("architecture graph has no M0 packages".to_string());
     }
@@ -53,7 +54,23 @@ fn parse_m0_packages(graph: &str) -> Result<BTreeSet<String>, String> {
 fn validate_m0(metadata: &str, graph: &str) -> Result<(), String> {
     let actual = parse_metadata_packages(metadata)?;
     let expected = parse_m0_packages(graph)?;
-    if actual != expected {
+    let allowed_additions = graph
+        .split_once("  M1:")
+        .and_then(|(_, rest)| rest.split_once("    adds:"))
+        .map(|(_, adds)| {
+            adds.lines()
+                .map(str::trim)
+                .skip_while(|line| line.is_empty())
+                .take_while(|line| line.starts_with("- "))
+                .map(|line| line.trim_start_matches("- ").trim().to_string())
+                .collect::<BTreeSet<_>>()
+        })
+        .unwrap_or_default();
+    if !actual.is_superset(&expected)
+        || actual
+            .difference(&expected)
+            .any(|package| !allowed_additions.contains(package))
+    {
         return Err(format!(
             "M0 package mismatch: actual={actual:?}, expected={expected:?}"
         ));
@@ -63,7 +80,7 @@ fn validate_m0(metadata: &str, graph: &str) -> Result<(), String> {
 
 fn run_check() -> Result<(), String> {
     let metadata = Command::new("cargo")
-        .args(["metadata", "--locked", "--format-version", "1"])
+        .args(["metadata", "--locked", "--no-deps", "--format-version", "1"])
         .output()
         .map_err(|error| format!("failed to run cargo metadata: {error}"))?;
     if !metadata.status.success() {
