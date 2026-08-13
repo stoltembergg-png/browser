@@ -73,3 +73,6 @@ jobs:
 
       - name: Check quality-gate manifest tests
         run: python3 -m unittest -v tests/test_quality_gate_check.py
+
+      - name: Run shell bootstrap acceptance tests
+        run: python3 -m unittest -v tests/test_shell_bootstrap.py
