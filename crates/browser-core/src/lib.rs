@@ -7,6 +7,7 @@
 //! contract defined in ADR-005 and `docs/contracts/runtime-lifecycle.md`.
 
 pub mod lifecycle;
+pub mod navigation;
 
 pub const PACKAGE_NAME: &str = "browser-core";
 
