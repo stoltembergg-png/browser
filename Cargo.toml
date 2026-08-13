@@ -4,6 +4,7 @@ members = [
     "crates/browser-domain",
     "crates/browser-core",
     "crates/engine-api",
+    "crates/servo-engine",
     "crates/test-support",
     "apps/desktop/src-tauri",
     "xtask",
