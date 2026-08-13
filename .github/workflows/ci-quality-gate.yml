@@ -80,6 +80,9 @@ jobs:
       - name: Run shell contract acceptance tests
         run: python3 -m unittest -v tests/test_shell_contract.py
 
+      - name: Run release manifest tests
+        run: python3 -m unittest -v tests/test_release_manifest.py
+
   # Cross-platform matrix: run core crate tests on Windows and macOS
   # to verify the engine-api, browser-domain, and servo-engine compile
   # and pass on all three target platforms.
