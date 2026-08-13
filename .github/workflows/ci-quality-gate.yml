@@ -32,6 +32,9 @@ jobs:
           toolchain: 1.97.1
           components: rustfmt, clippy
 
+      - name: Install Tauri Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libwebkit2gtk-4.1-dev
+
       - name: Verify locked metadata
         run: cargo metadata --locked --format-version 1
 

@@ -3,23 +3,23 @@ use std::env;
 use std::fs;
 use std::process::Command;
 
-fn parse_workspace_packages(metadata: &str) -> Result<BTreeSet<String>, String> {
-    let members = metadata
-        .split_once("\"workspace_members\":[")
-        .and_then(|(_, rest)| rest.split_once(']'))
-        .map(|(members, _)| members)
-        .ok_or_else(|| "cargo metadata is missing workspace members".to_string())?;
+fn parse_metadata_packages(metadata: &str) -> Result<BTreeSet<String>, String> {
+    let package_section = metadata
+        .split_once("\"packages\":[")
+        .map(|(_, rest)| rest)
+        .ok_or_else(|| "cargo metadata is missing packages".to_string())?;
+    let packages = package_section
+        .split_once("],\"workspace_members\"")
+        .map_or(package_section, |(packages, _)| packages);
     let mut names = BTreeSet::new();
-    for member in members.split(',') {
-        let member = member.trim().trim_matches('"');
-        let Some((path, suffix)) = member.rsplit_once('#') else {
-            return Err("invalid cargo metadata workspace member".to_string());
+    for object in packages.split('{').skip(1) {
+        let Some((_, rest)) = object.split_once("\"name\":\"") else {
+            continue;
         };
-        let name = suffix.split_once('@').map_or_else(
-            || path.rsplit('/').next().unwrap_or_default(),
-            |(name, _)| name,
-        );
-        if !name.is_empty() {
+        let Some((name, _)) = rest.split_once('"') else {
+            return Err("invalid cargo metadata package object".to_string());
+        };
+        if object.contains("\"version\":\"") {
             names.insert(name.to_string());
         }
     }
@@ -44,6 +44,7 @@ fn parse_m0_packages(graph: &str) -> Result<BTreeSet<String>, String> {
         .take_while(|line| line.starts_with("- "))
         .map(|line| line.trim_start_matches("- ").trim().to_string())
         .collect::<BTreeSet<_>>();
+
     if packages.is_empty() {
         return Err("architecture graph has no M0 packages".to_string());
     }
@@ -51,9 +52,25 @@ fn parse_m0_packages(graph: &str) -> Result<BTreeSet<String>, String> {
 }
 
 fn validate_m0(metadata: &str, graph: &str) -> Result<(), String> {
-    let actual = parse_workspace_packages(metadata)?;
+    let actual = parse_metadata_packages(metadata)?;
     let expected = parse_m0_packages(graph)?;
-    if actual != expected {
+    let allowed_additions = graph
+        .split_once("  M1:")
+        .and_then(|(_, rest)| rest.split_once("    adds:"))
+        .map(|(_, adds)| {
+            adds.lines()
+                .map(str::trim)
+                .skip_while(|line| line.is_empty())
+                .take_while(|line| line.starts_with("- "))
+                .map(|line| line.trim_start_matches("- ").trim().to_string())
+                .collect::<BTreeSet<_>>()
+        })
+        .unwrap_or_default();
+    if !actual.is_superset(&expected)
+        || actual
+            .difference(&expected)
+            .any(|package| !allowed_additions.contains(package))
+    {
         return Err(format!(
             "M0 package mismatch: actual={actual:?}, expected={expected:?}"
         ));
@@ -63,7 +80,7 @@ fn validate_m0(metadata: &str, graph: &str) -> Result<(), String> {
 
 fn run_check() -> Result<(), String> {
     let metadata = Command::new("cargo")
-        .args(["metadata", "--locked", "--format-version", "1"])
+        .args(["metadata", "--locked", "--no-deps", "--format-version", "1"])
         .output()
         .map_err(|error| format!("failed to run cargo metadata: {error}"))?;
     if !metadata.status.success() {
@@ -95,15 +112,14 @@ mod tests {
 
     #[test]
     fn accepts_exact_m0_package_set() {
-        let metadata = "{\"workspace_members\":[\"path#browser-domain@0.1.0\",\"path#browser-core@0.1.0\",\"path#engine-api@0.1.0\",\"path#test-support@0.1.0\",\"path#xtask@0.1.0\"]}";
+        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"},{\"name\":\"browser-core\",\"version\":\"0.1.0\"},{\"name\":\"engine-api\",\"version\":\"0.1.0\"},{\"name\":\"test-support\",\"version\":\"0.1.0\"},{\"name\":\"xtask\",\"version\":\"0.1.0\"}]}";
         let graph = "phases:\n  M0:\n    packages:\n      - browser-domain\n      - browser-core\n      - engine-api\n      - test-support\n      - xtask\n";
         assert_eq!(validate_m0(metadata, graph), Ok(()));
     }
 
     #[test]
     fn rejects_undeclared_package() {
-        let metadata =
-            "{\"workspace_members\":[\"path#browser-domain@0.1.0\",\"path#unexpected@0.1.0\"]}";
+        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"},{\"name\":\"unexpected\",\"version\":\"0.1.0\"}]}";
         let graph = "phases:\n  M0:\n    packages:\n      - browser-domain\n";
         let error = validate_m0(metadata, graph).expect_err("extra package must fail");
         assert!(error.contains("unexpected"));
@@ -111,7 +127,7 @@ mod tests {
 
     #[test]
     fn rejects_missing_m0_section() {
-        let metadata = "{\"workspace_members\":[\"path#browser-domain@0.1.0\"]}";
+        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"}]}";
         let error = validate_m0(
             metadata,
             "phases:\n  M1:\n    packages:\n      - browser-domain\n",

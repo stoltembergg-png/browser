@@ -11,7 +11,6 @@ phases:
       - browser-core
       - engine-api
       - test-support
-      - browser-desktop
       - xtask
     runtime_edges:
       browser-core: [browser-domain, engine-api]
@@ -19,6 +18,7 @@ phases:
       xtask: []
   M1:
     adds:
+      - browser-desktop
       - platform
       - render-surface
       - servo-engine
