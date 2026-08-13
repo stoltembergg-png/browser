@@ -5,19 +5,346 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Browser</title>
     <style>
-      :root { color-scheme: light; font: 16px system-ui, sans-serif; }
-      body { margin: 0; min-height: 100vh; background: #f5f7fb; color: #1d2433; }
-      main { max-width: 720px; margin: 18vh auto; padding: 2rem; text-align: center; }
-      .shell { border: 1px solid #dbe1ea; border-radius: 1.25rem; padding: 3rem; background: rgba(255,255,255,.72); box-shadow: 0 1rem 3rem rgba(46,58,80,.08); }
-      p { color: #647086; }
+      :root {
+        color-scheme: light;
+        font: 16px system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f5f7fb;
+        color: #1d2433;
+        display: flex;
+        flex-direction: column;
+      }
+      .toolbar {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: #fff;
+        border-bottom: 1px solid #dbe1ea;
+      }
+      .toolbar button {
+        font: inherit;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid #dbe1ea;
+        border-radius: 0.4rem;
+        background: #fff;
+        color: #1d2433;
+        cursor: pointer;
+      }
+      .toolbar button:hover {
+        background: #f0f3f8;
+      }
+      #omnibox {
+        flex: 1;
+        font: inherit;
+        padding: 0.4rem 0.6rem;
+        border: 1px solid #dbe1ea;
+        border-radius: 0.4rem;
+        background: #fff;
+      }
+      .tab-bar {
+        display: flex;
+        gap: 0.25rem;
+        padding: 0.25rem 1rem;
+        background: #eef1f6;
+        border-bottom: 1px solid #dbe1ea;
+        overflow-x: auto;
+      }
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 0.4rem 0.4rem 0 0;
+        background: #fff;
+        border: 1px solid #dbe1ea;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .tab.active {
+        background: #f5f7fb;
+        font-weight: 600;
+      }
+      .tab-close {
+        border: none;
+        background: none;
+        color: #647086;
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 0 0.2rem;
+      }
+      .tab-close:hover {
+        color: #1d2433;
+      }
+      .content {
+        flex: 1;
+        padding: 2rem;
+        text-align: center;
+      }
+      .placeholder {
+        color: #647086;
+        max-width: 480px;
+        margin: 12vh auto;
+      }
+      [aria-live="polite"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
     </style>
   </head>
   <body>
-    <main>
-      <section class="shell" aria-labelledby="title">
-        <h1 id="title">Browser shell</h1>
-        <p>Local Tauri window bootstrap. Web navigation is intentionally not enabled in this milestone.</p>
-      </section>
+    <!-- Tab bar -->
+    <div
+      class="tab-bar"
+      id="tab-bar"
+      role="tablist"
+      aria-label="Browser tabs"
+    ></div>
+
+    <!-- Toolbar with navigation controls and omnibox -->
+    <div class="toolbar" role="toolbar" aria-label="Navigation">
+      <button id="btn-back" type="button" aria-label="Go back" disabled>
+        ←
+      </button>
+      <button id="btn-forward" type="button" aria-label="Go forward" disabled>
+        →
+      </button>
+      <button id="btn-reload" type="button" aria-label="Reload page">
+        ⟳
+      </button>
+      <button id="btn-stop" type="button" aria-label="Stop loading" disabled>
+        ✕
+      </button>
+      <button id="btn-new-tab" type="button" aria-label="New tab">
+        +
+      </button>
+      <input
+        id="omnibox"
+        type="text"
+        aria-label="Address bar"
+        placeholder="Enter URL or search"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
+    <!-- Main content area -->
+    <main class="content" id="content">
+      <div class="placeholder">
+        <h1>Browser shell</h1>
+        <p>
+          Local Tauri window bootstrap. Web navigation is intentionally not
+          enabled in this milestone.
+        </p>
+      </div>
     </main>
+
+    <!-- Accessible status region for screen readers -->
+    <div id="status" aria-live="polite" role="status"></div>
+
+    <script>
+      // UI shell contract mock — PR-012
+      //
+      // This script demonstrates the typed command/event schema without
+      // connecting to a real Tauri bridge. Commands are sent via
+      // `sendCommand` and events are rendered via `renderEvent`.
+      // There is intentionally NO generic `invoke()` — every command
+      // is a named, typed variant matching `browser_domain::ui::UiCommand`.
+      //
+      // In a real Tauri build the bridge layer calls
+      // `browser_domain::ui::parse_command()` on the Rust side and
+      // rejects malformed input before executing.
+      "use strict";
+
+      const UI_CONTRACT_VERSION = 1;
+      let requestCounter = 0;
+      let tabCounter = 0;
+      let activeTabId = null;
+      const tabs = new Map(); // tabId -> {id, title, url}
+
+      const omnibox = document.getElementById("omnibox");
+      const tabBar = document.getElementById("tab-bar");
+      const status = document.getElementById("status");
+      const content = document.getElementById("content");
+
+      // --- Command sending (mock — no generic invoke) ---
+
+      function nextRequestId() {
+        requestCounter++;
+        return "req-" + requestCounter;
+      }
+
+      function sendCommand(command, tabId) {
+        // Build a typed command envelope matching UiCommand schema.
+        const envelope = {
+          version: UI_CONTRACT_VERSION,
+          request_id: nextRequestId(),
+          tab_id: tabId || null,
+          command: command,
+        };
+        // Mock: emit a synthetic event for demonstration.
+        // Real Tauri: invoke a typed Tauri command, not a generic bridge.
+        handleCommandResult(envelope);
+      }
+
+      function handleCommandResult(envelope) {
+        // Simulate core processing and emitting an event back.
+        const cmd = envelope.command;
+        if (cmd.type === "navigate") {
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_started", url: cmd.url },
+          });
+        } else if (cmd.type === "new_tab") {
+          const id = "tab-" + (++tabCounter);
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: null,
+            event: { type: "tab_created", tab_id: id },
+          });
+        } else if (cmd.type === "close_tab") {
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: cmd.target_tab_id,
+            event: { type: "tab_closed", tab_id: cmd.target_tab_id },
+          });
+        }
+      }
+
+      // --- Event rendering (core → UI) ---
+
+      function renderEvent(envelope) {
+        const event = envelope.event;
+        switch (event.type) {
+          case "tab_created": {
+            tabs.set(event.tab_id, {
+              id: event.tab_id,
+              title: "New Tab",
+              url: "",
+            });
+            selectTab(event.tab_id);
+            break;
+          }
+          case "tab_closed": {
+            tabs.delete(event.tab_id);
+            if (activeTabId === event.tab_id) {
+              const remaining = Array.from(tabs.keys());
+              activeTabId = remaining.length > 0 ? remaining[0] : null;
+            }
+            break;
+          }
+          case "tab_selected": {
+            activeTabId = event.tab_id;
+            break;
+          }
+          case "navigation_started": {
+            const tab = tabs.get(envelope.tab_id);
+            if (tab) {
+              tab.url = event.url;
+              if (activeTabId === tab.id) {
+                omnibox.value = event.url;
+              }
+            }
+            status.textContent = "Loading " + event.url;
+            break;
+          }
+          case "title_changed": {
+            const tab = tabs.get(envelope.tab_id);
+            if (tab) tab.title = event.title;
+            break;
+          }
+          case "command_rejected": {
+            status.textContent = "Error: " + event.reason;
+            break;
+          }
+          default:
+            // Unknown event — do not crash, log to status.
+            status.textContent = "Unknown event received";
+            break;
+        }
+        renderTabs();
+      }
+
+      // --- DOM rendering ---
+
+      function renderTabs() {
+        tabBar.innerHTML = "";
+        tabs.forEach((tab) => {
+          const el = document.createElement("div");
+          el.className = "tab" + (tab.id === activeTabId ? " active" : "");
+          el.setAttribute("role", "tab");
+          el.setAttribute("aria-selected", tab.id === activeTabId);
+          el.setAttribute("tabindex", "0");
+          el.textContent = tab.title;
+
+          const closeBtn = document.createElement("button");
+          closeBtn.className = "tab-close";
+          closeBtn.setAttribute("type", "button");
+          closeBtn.setAttribute("aria-label", "Close tab " + tab.title);
+          closeBtn.textContent = "✕";
+          closeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sendCommand(
+              { type: "close_tab", target_tab_id: tab.id },
+              tab.id,
+            );
+          });
+          el.appendChild(closeBtn);
+
+          el.addEventListener("click", () => selectTab(tab.id));
+          tabBar.appendChild(el);
+        });
+      }
+
+      function selectTab(id) {
+        activeTabId = id;
+        const tab = tabs.get(id);
+        if (tab) {
+          omnibox.value = tab.url || "";
+        }
+        renderTabs();
+      }
+
+      // --- Event listeners ---
+
+      omnibox.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const url = omnibox.value.trim();
+          if (url) {
+            sendCommand({ type: "navigate", url: url }, activeTabId);
+          }
+        }
+      });
+
+      document.getElementById("btn-new-tab").addEventListener("click", () => {
+        sendCommand({ type: "new_tab" }, null);
+      });
+
+      document.getElementById("btn-back").addEventListener("click", () => {
+        sendCommand({ type: "go_back" }, activeTabId);
+      });
+
+      document.getElementById("btn-forward").addEventListener("click", () => {
+        sendCommand({ type: "go_forward" }, activeTabId);
+      });
+
+      document.getElementById("btn-reload").addEventListener("click", () => {
+        sendCommand({ type: "reload" }, activeTabId);
+      });
+
+      document.getElementById("btn-stop").addEventListener("click", () => {
+        sendCommand({ type: "stop" }, activeTabId);
+      });
+
+      // Initialize with one tab.
+      sendCommand({ type: "new_tab" }, null);
+    </script>
   </body>
 </html>
