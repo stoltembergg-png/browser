@@ -47,6 +47,14 @@ stateDiagram-v2
 | Restarting | Ready | restart succeeds | `EngineReady` event |
 | Restarting | Failed | retry exhausted | `EngineExited` event |
 
+## Recovery and fencing (PR-028)
+
+Crash/hang recovery is engine-neutral and does not claim process isolation. Each engine incarnation has a monotonic `EngineEpoch`; events and checkpoints from a previous epoch are rejected before changing browser state. Navigation generations remain fenced within the current epoch, so a stale replay after restart cannot commit into the new tab state.
+
+Recovery records only redacted diagnostics (`[REDACTED]`) and classifies failures as panic, out-of-memory, or watchdog timeout. Restart attempts are bounded. A restart creates a new epoch and explicitly aborts any in-flight form submission; forms are never automatically resubmitted. Exhausted retries and abrupt shutdown produce a terminal result while retaining the last valid checkpoint for inspection/recovery policy.
+
+Checkpoint writes use prepare → commit/abort semantics. The durable journal appends a complete record and calls `sync_all` before making it visible; recovery uses the newest complete record and ignores an incomplete final record. This is a persistence seam, not a process sandbox or a claim that the real Servo engine has passed the contract. Real engine crash/hang artifacts remain required by the engine-contract manifest.
+
 ## Terminal states
 
 - `Exited`: engine instance is fully destroyed. Resources are freed. No further commands accepted.
