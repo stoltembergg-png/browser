@@ -19,6 +19,7 @@
 //! See ARCHITECTURE.md §6 and ADR-003 for the full rationale.
 
 pub mod contract;
+pub mod envelopes;
 pub mod events;
 pub mod surface;
 
