@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "authority": "ADR-005",
+  "status": "proposed",
+  "lifecycle_accepts_commands": ["ready", "navigating"],
+  "lifecycle_terminal_states": ["exited"],
+  "quotas": {
+    "command_timeout_ms": 30000,
+    "queue_capacity": 256,
+    "shutdown_drain_timeout_ms": 5000,
+    "restart_max_attempts": 3,
+    "restart_backoff_ms": 1000,
+    "input_coalesce": true
+  },
+  "reliable_commands": ["navigate", "reload", "shutdown"]
+}
