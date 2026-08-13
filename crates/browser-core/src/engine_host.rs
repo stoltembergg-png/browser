@@ -51,7 +51,7 @@ pub enum HostSignal {
 /// This is a synchronous testkit version: no real threads, no channels.
 /// The real version (PR-025+) will use `std::thread` or `tokio::spawn`.
 pub struct EngineHost<E: BrowserEngine> {
-    engine: E,
+    pub engine: E,
     instance_id: Option<EngineInstanceId>,
     state: LifecycleState,
     /// Bounded command queue.
