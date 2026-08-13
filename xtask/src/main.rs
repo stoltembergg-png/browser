@@ -3,23 +3,23 @@ use std::env;
 use std::fs;
 use std::process::Command;
 
-fn parse_metadata_packages(metadata: &str) -> Result<BTreeSet<String>, String> {
-    let package_section = metadata
-        .split_once("\"packages\":[")
-        .map(|(_, rest)| rest)
-        .ok_or_else(|| "cargo metadata is missing packages".to_string())?;
-    let packages = package_section
-        .split_once("],\"workspace_members\"")
-        .map_or(package_section, |(packages, _)| packages);
+fn parse_workspace_packages(metadata: &str) -> Result<BTreeSet<String>, String> {
+    let members = metadata
+        .split_once("\"workspace_members\":[")
+        .and_then(|(_, rest)| rest.split_once(']'))
+        .map(|(members, _)| members)
+        .ok_or_else(|| "cargo metadata is missing workspace members".to_string())?;
     let mut names = BTreeSet::new();
-    for object in packages.split('{').skip(1) {
-        let Some((_, rest)) = object.split_once("\"name\":\"") else {
-            continue;
+    for member in members.split(',') {
+        let member = member.trim().trim_matches('"');
+        let Some((path, suffix)) = member.rsplit_once('#') else {
+            return Err("invalid cargo metadata workspace member".to_string());
         };
-        let Some((name, _)) = rest.split_once('"') else {
-            return Err("invalid cargo metadata package object".to_string());
-        };
-        if object.contains("\"version\":\"") {
+        let name = suffix.split_once('@').map_or_else(
+            || path.rsplit('/').next().unwrap_or_default(),
+            |(name, _)| name,
+        );
+        if !name.is_empty() {
             names.insert(name.to_string());
         }
     }
@@ -51,7 +51,7 @@ fn parse_m0_packages(graph: &str) -> Result<BTreeSet<String>, String> {
 }
 
 fn validate_m0(metadata: &str, graph: &str) -> Result<(), String> {
-    let actual = parse_metadata_packages(metadata)?;
+    let actual = parse_workspace_packages(metadata)?;
     let expected = parse_m0_packages(graph)?;
     if actual != expected {
         return Err(format!(
@@ -95,14 +95,15 @@ mod tests {
 
     #[test]
     fn accepts_exact_m0_package_set() {
-        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"},{\"name\":\"browser-core\",\"version\":\"0.1.0\"},{\"name\":\"engine-api\",\"version\":\"0.1.0\"},{\"name\":\"test-support\",\"version\":\"0.1.0\"},{\"name\":\"xtask\",\"version\":\"0.1.0\"}]}";
+        let metadata = "{\"workspace_members\":[\"path#browser-domain@0.1.0\",\"path#browser-core@0.1.0\",\"path#engine-api@0.1.0\",\"path#test-support@0.1.0\",\"path#xtask@0.1.0\"]}";
         let graph = "phases:\n  M0:\n    packages:\n      - browser-domain\n      - browser-core\n      - engine-api\n      - test-support\n      - xtask\n";
         assert_eq!(validate_m0(metadata, graph), Ok(()));
     }
 
     #[test]
     fn rejects_undeclared_package() {
-        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"},{\"name\":\"unexpected\",\"version\":\"0.1.0\"}]}";
+        let metadata =
+            "{\"workspace_members\":[\"path#browser-domain@0.1.0\",\"path#unexpected@0.1.0\"]}";
         let graph = "phases:\n  M0:\n    packages:\n      - browser-domain\n";
         let error = validate_m0(metadata, graph).expect_err("extra package must fail");
         assert!(error.contains("unexpected"));
@@ -110,7 +111,7 @@ mod tests {
 
     #[test]
     fn rejects_missing_m0_section() {
-        let metadata = "{\"packages\":[{\"name\":\"browser-domain\",\"version\":\"0.1.0\"}]}";
+        let metadata = "{\"workspace_members\":[\"path#browser-domain@0.1.0\"]}";
         let error = validate_m0(
             metadata,
             "phases:\n  M1:\n    packages:\n      - browser-domain\n",

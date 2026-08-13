@@ -11,6 +11,7 @@ phases:
       - browser-core
       - engine-api
       - test-support
+      - browser-desktop
       - xtask
     runtime_edges:
       browser-core: [browser-domain, engine-api]
