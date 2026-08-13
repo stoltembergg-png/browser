@@ -1,0 +1,33 @@
+[package]
+name = "servo-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+engine-api.workspace = true
+
+# The `servo-backend` feature enables the real Servo dependency.
+# When disabled (default for CI), the adapter uses stub types.
+#
+# To enable the real adapter locally, add this to the [dependencies] section:
+#
+#   [dependencies.servo]
+#   version = "0.5"
+#   git = "https://github.com/servo/servo"
+#   rev = "859bd5edd60c0fb162a1f73c083a23e55474faf7"
+#   optional = true
+#
+# And add `servo-backend = ["dep:servo"]` to [features].
+# This requires system libraries: libwebkit2gtk-4.1-dev, JavaScriptCore, etc.
+
+[features]
+default = []
+# servo-backend = ["dep:servo"]
+
+[lib]
+path = "src/lib.rs"
