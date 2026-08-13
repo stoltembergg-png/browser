@@ -7,6 +7,7 @@
 //! contract defined in ADR-005 and `docs/contracts/runtime-lifecycle.md`.
 
 pub mod engine_host;
+pub mod ipc_bridge;
 pub mod lifecycle;
 pub mod navigation;
 

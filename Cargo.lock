@@ -133,6 +133,7 @@ version = "0.1.0"
 dependencies = [
  "browser-domain",
  "engine-api",
+ "serde_json",
 ]
 
 [[package]]
