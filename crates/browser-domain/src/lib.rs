@@ -3,6 +3,9 @@
 /// Stable identifier types will be added by a later domain slice.
 pub const PACKAGE_NAME: &str = "browser-domain";
 
+pub mod ids;
+pub mod ui;
+
 #[cfg(test)]
 mod tests {
     #[test]

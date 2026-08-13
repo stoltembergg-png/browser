@@ -76,3 +76,6 @@ jobs:
 
       - name: Run shell bootstrap acceptance tests
         run: python3 -m unittest -v tests/test_shell_bootstrap.py
+
+      - name: Run shell contract acceptance tests
+        run: python3 -m unittest -v tests/test_shell_contract.py
