@@ -714,6 +714,8 @@ name = "engine-api"
 version = "0.1.0"
 dependencies = [
  "browser-domain",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
