@@ -61,6 +61,12 @@ pub enum EngineEvent {
 
     /// The command queue is saturated (backpressure signal).
     QueueSaturated,
+
+    /// A frame is ready for presentation.
+    ///
+    /// The engine host should call `paint` and `present` on the rendering
+    /// context. Added in PR-014 per the render surface spike findings.
+    FrameReady,
 }
 
 #[cfg(test)]
@@ -102,6 +108,13 @@ mod tests {
         let event = EngineEvent::QueueSaturated;
         let json = serde_json::to_string(&event).expect("serialize");
         assert_eq!(json, r#"{"type":"queue_saturated"}"#);
+    }
+
+    #[test]
+    fn frame_ready_serializes_with_snake_case() {
+        let event = EngineEvent::FrameReady;
+        let json = serde_json::to_string(&event).expect("serialize");
+        assert_eq!(json, r#"{"type":"frame_ready"}"#);
     }
 
     #[test]
