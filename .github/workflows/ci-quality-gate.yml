@@ -74,6 +74,9 @@ jobs:
       - name: Check architecture graph
         run: cargo run -p xtask --locked -- architecture-check
 
+      - name: Run MVP smoke harness
+        run: cargo run -p xtask --locked -- smoke
+
       - name: Check quality-gate evidence manifest
         run: python3 scripts/quality_gate_check.py
 
