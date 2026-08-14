@@ -17,7 +17,13 @@
     "Check security baseline",
     "Run threat regression gate tests",
     "Validate threat regression manifest",
-    "Check architecture graph"
+    "Check architecture graph",
+    "Run MVP smoke harness",
+    "Check quality-gate evidence manifest",
+    "Check quality-gate manifest tests",
+    "Run shell bootstrap acceptance tests",
+    "Run shell contract acceptance tests",
+    "Run release manifest tests"
   ],
   "evidence_fields": [
     "repository",
