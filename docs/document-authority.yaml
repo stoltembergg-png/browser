@@ -54,6 +54,7 @@ present:
   - docs/security/GITHUB_ACTIONS_SECURITY.md
   - docs/security/threat-regression-manifest.json
   - docs/contracts/workspace-contract.md
+  - docs/contracts/navigation-chrome-contract.md
 
 planned:
   - path: DEVELOPMENT.md

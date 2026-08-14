@@ -112,6 +112,8 @@ pub enum UiEvent {
     NavigationFinished { url: String },
     /// Navigation failed with a typed error.
     NavigationFailed { reason: String },
+    /// Navigation was cancelled by Stop or a newer navigation.
+    NavigationCancelled,
     /// The page title changed.
     TitleChanged { title: String },
     /// A download started and is streaming.
@@ -135,6 +137,111 @@ pub enum UiEvent {
     /// The core emits this instead of executing an invalid command so the UI
     /// can surface an error without crashing.
     CommandRejected { reason: String },
+}
+
+// ---------------------------------------------------------------------------
+// Navigation chrome state
+// ---------------------------------------------------------------------------
+
+/// Engine-neutral state rendered by the browser chrome.
+///
+/// The state deliberately contains no page content or engine handles. The
+/// engine/tab boundary is responsible for rejecting stale events before they
+/// reach this projection.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NavigationChromeState {
+    url: Option<String>,
+    title: Option<String>,
+    loading: bool,
+    error: Option<String>,
+    can_go_back: bool,
+    can_go_forward: bool,
+}
+
+impl NavigationChromeState {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Apply a typed event and report whether it changed chrome state.
+    pub fn apply_event(&mut self, event: &UiEvent) -> bool {
+        match event {
+            UiEvent::NavigationStarted { url } => {
+                self.url = Some(url.clone());
+                self.loading = true;
+                self.error = None;
+                true
+            }
+            UiEvent::NavigationCommitted { url } => {
+                self.url = Some(url.clone());
+                self.error = None;
+                true
+            }
+            UiEvent::NavigationFinished { url } => {
+                self.url = Some(url.clone());
+                self.loading = false;
+                self.error = None;
+                true
+            }
+            UiEvent::NavigationFailed { reason } => {
+                self.loading = false;
+                self.error = Some(reason.clone());
+                true
+            }
+            UiEvent::NavigationCancelled => {
+                self.loading = false;
+                self.error = None;
+                true
+            }
+            UiEvent::TitleChanged { title } if self.url.is_some() => {
+                self.title = Some(title.clone());
+                true
+            }
+            UiEvent::CommandRejected { reason } => {
+                self.loading = false;
+                self.error = Some(reason.clone());
+                true
+            }
+            _ => false,
+        }
+    }
+
+    pub fn set_history_capabilities(&mut self, can_go_back: bool, can_go_forward: bool) {
+        self.can_go_back = can_go_back;
+        self.can_go_forward = can_go_forward;
+    }
+
+    pub fn url(&self) -> Option<&str> {
+        self.url.as_deref()
+    }
+
+    pub fn title(&self) -> Option<&str> {
+        self.title.as_deref()
+    }
+
+    pub fn error(&self) -> Option<&str> {
+        self.error.as_deref()
+    }
+
+    pub fn is_loading(&self) -> bool {
+        self.loading
+    }
+
+    pub fn can_go_back(&self) -> bool {
+        self.can_go_back
+    }
+
+    pub fn can_go_forward(&self) -> bool {
+        self.can_go_forward
+    }
+
+    pub fn can_reload(&self) -> bool {
+        self.url.is_some() && !self.loading
+    }
+
+    pub fn can_stop(&self) -> bool {
+        self.loading
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -359,6 +466,15 @@ mod tests {
             EventParseResult::Ok(env) => {
                 assert!(matches!(env.event, UiEvent::TitleChanged { .. }));
             }
+            EventParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_navigation_cancelled_event() {
+        let raw = r#"{"version":1,"tab_id":"tab-1","event":{"type":"navigation_cancelled"}}"#;
+        match parse_event(raw) {
+            EventParseResult::Ok(env) => assert!(matches!(env.event, UiEvent::NavigationCancelled)),
             EventParseResult::Rejected(reason) => panic!("rejected: {reason}"),
         }
     }
