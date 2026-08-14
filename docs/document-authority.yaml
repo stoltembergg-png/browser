@@ -36,6 +36,7 @@ present:
   - CURRENT_STATE.md
   - docs/development/CRITICAL_PATH.md
   - docs/development/EXECUTION_MAP.md
+  - docs/development/SESSION_RECOVERY_RUNBOOK.md
   - docs/development/WAVE-001.md
   - docs/development/github-issue-map.json
   - docs/development/github-pr-map.json

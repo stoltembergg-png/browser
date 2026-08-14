@@ -28,6 +28,7 @@
 | `CURRENT_STATE.md` | materialization/operations | milestone atual, wave, blockers, Draft PRs e próximo gate | GitHub API + `PR_PLAN.md` |
 | `docs/development/CRITICAL_PATH.md` | materialization/operations | caminho crítico, paralelismo e blockers até MVP | `ROADMAP.md` + `docs/pr-dag.yaml` |
 | `docs/development/EXECUTION_MAP.md` | materialization/operations | mapa milestone → Issue → Draft PR → gates | `PR_PLAN.md` + GitHub mapping |
+| `docs/development/SESSION_RECOVERY_RUNBOOK.md` | PR-036 | shutdown transacional, restore seguro e failure paths | `PR_PLAN.md` + testes do card |
 | `docs/development/WAVE-001.md` | materialization/operations | primeira wave e evidence mapping | GitHub API + `docs/pr-dag.yaml` |
 | `docs/development/github-issue-map.json` | materialization/operations | ID estável → Issue number | GitHub API snapshot |
 | `docs/development/github-pr-map.json` | materialization/operations | ID estável → Draft PR/branch/last-verified head SHA | GitHub API + git |

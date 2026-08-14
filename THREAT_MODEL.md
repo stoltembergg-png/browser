@@ -28,7 +28,7 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 | TM-014 | extension → core | excessive extension privilege | data exfiltration/automation | extensions out of MVP; manifest/capability/process boundary | extension threat suite | deferred |
 | TM-015 | diagnostics → telemetry | sensitive URL/PII leakage | privacy breach | fixed `[REDACTED]` detail marker; no raw crash/hang detail retained by recovery policy | `crash_records_redacted_diagnostics_without_raw_detail`; security gate | control implemented; telemetry integration pending |
 | TM-016 | engine hang/crash | denial/data loss | tab loss/app unavailable | watchdog/hang classification, bounded restart attempts, checkpoint retention, epoch/generation fencing, terminal result; no automatic form resubmission | `crash_recovery` crash/hang/restart/abrupt-shutdown tests | control implemented; real engine E2E pending |
-| TM-017 | storage migration | malformed/corrupt profile | data loss/startup failure | versioned schema, transactional migration, backup/recovery | kill-at-each-step/old versions | planejado |
+| TM-017 | storage migration | malformed/corrupt profile | data loss/startup failure | versioned session schema, transactional journal, last-valid-snapshot recovery; full profile migration remains separate | torn/failed session commit, restore validation; old-version migration remains a downstream gate | control implemented for PR-036; full migration pending |
 | TM-018 | external protocol | handler abuse | shell command execution/phishing | explicit allowlist/confirmation/no interpolation | protocol corpus | planejado |
 
 ## Abuse-case acceptance tests
