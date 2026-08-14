@@ -24,6 +24,7 @@ present:
   - docs/specs/SPEC-000-template.md
   - docs/specs/SPEC-030-tab-domain.md
   - docs/specs/SPEC-031-tab-manager.md
+  - docs/specs/SPEC-032-tab-strip.md
   - docs/architecture-graph.yaml
   - docs/document-authority.yaml
   - docs/gates/release-gates.yaml
