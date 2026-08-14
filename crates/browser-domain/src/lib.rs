@@ -6,6 +6,7 @@ pub const PACKAGE_NAME: &str = "browser-domain";
 pub mod bookmarks;
 pub mod history;
 pub mod ids;
+pub mod permissions;
 pub mod profile;
 pub mod session;
 pub mod tab;
