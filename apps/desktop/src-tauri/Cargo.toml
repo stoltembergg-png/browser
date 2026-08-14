@@ -10,3 +10,6 @@ tauri-build = { version = "2.2.0" }
 
 [dependencies]
 tauri.workspace = true
+
+[dev-dependencies]
+serde_json = "1.0"

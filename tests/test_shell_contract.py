@@ -17,6 +17,8 @@ from pathlib import Path
 
 WORKSPACE = Path(__file__).parents[1]
 FRONTEND = WORKSPACE / "apps" / "desktop" / "frontend" / "index.html"
+FRONTEND_JS = WORKSPACE / "apps" / "desktop" / "frontend" / "app.js"
+FRONTEND_CSS = WORKSPACE / "apps" / "desktop" / "frontend" / "styles.css"
 
 # Known typed command types matching browser_domain::ui::UiCommand
 KNOWN_COMMAND_TYPES = {
@@ -47,7 +49,11 @@ KNOWN_EVENT_TYPES = {
 class ShellContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.assertTrue(FRONTEND.exists(), f"frontend missing at {FRONTEND}")
+        self.assertTrue(FRONTEND_JS.exists(), f"frontend JS missing at {FRONTEND_JS}")
+        self.assertTrue(FRONTEND_CSS.exists(), f"frontend CSS missing at {FRONTEND_CSS}")
         self.html = FRONTEND.read_text(encoding="utf-8")
+        self.js = FRONTEND_JS.read_text(encoding="utf-8")
+        self.css = FRONTEND_CSS.read_text(encoding="utf-8")
 
     def test_omnibox_component_exists(self) -> None:
         """The omnibox (address bar) must be present with an accessible label."""
@@ -65,35 +71,35 @@ class ShellContractTests(unittest.TestCase):
         """Each tab must identify the panel it controls and the panel must be labelled."""
         self.assertIn('id="tab-panel"', self.html)
         self.assertIn('role="tabpanel"', self.html)
-        self.assertIn('setAttribute("aria-controls", "tab-panel")', self.html)
-        self.assertIn('content.setAttribute("aria-labelledby", "tab-"', self.html)
+        self.assertIn('setAttribute("aria-controls", "tab-panel")', self.js)
+        self.assertIn('content.setAttribute("aria-labelledby", "tab-"', self.js)
 
     def test_tab_strip_uses_keyboard_navigation(self) -> None:
         """The tab strip must provide roving focus and arrow/Home/End handling."""
         self.assertIn('tabindex="0"', self.html)
         self.assertIn('tabindex', self.html)
-        self.assertIn('event.key === "ArrowRight"', self.html)
-        self.assertIn('event.key === "ArrowLeft"', self.html)
-        self.assertIn('event.key === "Home"', self.html)
-        self.assertIn('event.key === "End"', self.html)
-        self.assertIn('.focus()', self.html)
+        self.assertIn('event.key === "ArrowRight"', self.js)
+        self.assertIn('event.key === "ArrowLeft"', self.js)
+        self.assertIn('event.key === "Home"', self.js)
+        self.assertIn('event.key === "End"', self.js)
+        self.assertIn('.focus()', self.js)
 
     def test_tab_selection_uses_typed_command(self) -> None:
         """Selecting a tab must send the typed select_tab command, not only mutate DOM."""
-        self.assertIn('{ type: "select_tab", target_tab_id: id }', self.html)
-        self.assertIn('cmd.type === "select_tab"', self.html)
+        self.assertIn('{ type: "select_tab", target_tab_id: id }', self.js)
+        self.assertIn('cmd.type === "select_tab"', self.js)
 
     def test_stale_tab_events_are_ignored(self) -> None:
         """Events for unknown tabs must not create or select stale UI state."""
-        self.assertIn('const eventTabId = event.tab_id || envelope.tab_id;', self.html)
-        self.assertIn('!tabs.has(eventTabId)', self.html)
+        self.assertIn('const eventTabId = event.tab_id || envelope.tab_id;', self.js)
+        self.assertIn('!tabs.has(eventTabId)', self.js)
 
     def test_tab_close_affordance_is_explicit(self) -> None:
         """Tab close controls must be separate labeled buttons, not text-only decoration."""
-        self.assertIn('className = "tab-close"', self.html)
-        self.assertIn('aria-label", "Close tab "', self.html)
-        self.assertIn('min-width: 1.75rem', self.html)
-        self.assertNotIn('closeBtn.appendChild(el)', self.html)
+        self.assertIn('className = "tab-close"', self.js)
+        self.assertIn('aria-label", "Close tab "', self.js)
+        self.assertIn('min-width: 1.75rem', self.css)
+        self.assertNotIn('closeBtn.appendChild(el)', self.js)
 
     def test_navigation_buttons_have_labels(self) -> None:
         """Each navigation button must have an accessible aria-label."""
@@ -105,16 +111,17 @@ class ShellContractTests(unittest.TestCase):
 
     def test_no_generic_invoke(self) -> None:
         """The frontend must not use a generic invoke bridge."""
-        self.assertNotIn(
-            "__TAURI_INTERNALS__",
-            self.html,
-            "frontend references Tauri internal invoke bridge",
-        )
-        self.assertNotIn(
-            ".invoke(",
-            self.html,
-            "frontend uses a generic .invoke() call",
-        )
+        for source_name, source in (("index.html", self.html), ("app.js", self.js)):
+            self.assertNotIn(
+                "__TAURI_INTERNALS__",
+                source,
+                f"{source_name} references Tauri internal invoke bridge",
+            )
+            self.assertNotIn(
+                ".invoke(",
+                source,
+                f"{source_name} uses a generic .invoke() call",
+            )
 
     def test_status_region_is_accessible(self) -> None:
         """An aria-live status region must exist for screen reader announcements."""
@@ -124,7 +131,7 @@ class ShellContractTests(unittest.TestCase):
     def test_typed_command_names_match_schema(self) -> None:
         """All command type strings in the JS must be known schema variants."""
         # Find all "type":"<value>" occurrences in command contexts.
-        types = re.findall(r'"type":\s*"(\w+)"', self.html)
+        types = re.findall(r'"type":\s*"(\w+)"', self.js)
         for t in types:
             # Allow event types too (they use the same tag pattern)
             self.assertTrue(
@@ -136,7 +143,7 @@ class ShellContractTests(unittest.TestCase):
         """The renderEvent function must have a default/unknown case."""
         self.assertIn(
             "default:",
-            self.html,
+            self.js,
             "renderEvent must handle unknown events with a default case",
         )
 

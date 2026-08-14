@@ -20,6 +20,8 @@ present:
   - SOURCES.md
   - docs/decisions/README.md
   - docs/decisions/ADR-000-template.md
+  - docs/decisions/ADR-007.md
+  - docs/contracts/tauri-capabilities-map.md
   - docs/specs/README.md
   - docs/specs/SPEC-000-template.md
   - docs/specs/SPEC-030-tab-domain.md
@@ -74,8 +76,6 @@ planned:
     owner_pr: PR-020/023
   - path: docs/decisions/ADR-006.md
     owner_pr: PR-035/037
-  - path: docs/decisions/ADR-007.md
-    owner_pr: PR-021/024/045
   - path: docs/decisions/ADR-008.md
     owner_pr: PR-064/065/066/069/070
   - path: docs/decisions/ADR-009.md

@@ -13,6 +13,63 @@
 //!
 //! See ADR-007 and `docs/contracts/tauri-capabilities-map.md`.
 
+/// The fixed local origin for the privileged Tauri UI.
+pub const PRIVILEGED_UI_ORIGIN: &str = "http://tauri.localhost";
+/// The only window label allowed to use the privileged UI bridge.
+pub const PRIVILEGED_UI_WINDOW: &str = "main";
+
+/// Caller metadata supplied by the trusted shell boundary, not by page content.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IpcCallerContext {
+    origin: String,
+    window_label: String,
+    top_level_frame: bool,
+    generation: u64,
+}
+
+impl IpcCallerContext {
+    pub fn new(
+        origin: impl Into<String>,
+        window_label: impl Into<String>,
+        top_level_frame: bool,
+        generation: u64,
+    ) -> Self {
+        Self {
+            origin: origin.into(),
+            window_label: window_label.into(),
+            top_level_frame,
+            generation,
+        }
+    }
+}
+
+/// Errors returned when the privileged UI boundary rejects a caller.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CallerContextError {
+    OriginDenied,
+    WindowDenied,
+    IframeDenied,
+    StaleGeneration { expected: u64, got: u64 },
+}
+
+impl std::fmt::Display for CallerContextError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::OriginDenied => formatter.write_str("privileged UI origin denied"),
+            Self::WindowDenied => formatter.write_str("privileged UI window denied"),
+            Self::IframeDenied => formatter.write_str("iframe caller denied"),
+            Self::StaleGeneration { expected, got } => {
+                write!(
+                    formatter,
+                    "stale generation: expected {expected}, got {got}"
+                )
+            }
+        }
+    }
+}
+
+impl std::error::Error for CallerContextError {}
+
 use std::collections::HashSet;
 
 use browser_domain::ui::{CommandEnvelope, EventEnvelope, UiCommand, UI_CONTRACT_VERSION};
@@ -42,6 +99,8 @@ pub enum IpcError {
         scoped_tab_id: String,
         target_tab_id: String,
     },
+    /// Trusted shell caller context did not match the privileged UI boundary.
+    CallerContext(CallerContextError),
 }
 
 impl std::fmt::Display for IpcError {
@@ -71,7 +130,14 @@ impl std::fmt::Display for IpcError {
                 f,
                 "target tab {target_tab_id} does not match scoped tab {scoped_tab_id}"
             ),
+            IpcError::CallerContext(error) => write!(f, "caller context rejected: {error}"),
         }
+    }
+}
+
+impl From<CallerContextError> for IpcError {
+    fn from(error: CallerContextError) -> Self {
+        Self::CallerContext(error)
     }
 }
 
@@ -99,6 +165,32 @@ impl IpcBridge {
     /// Unregister a tab.
     pub fn unregister_tab(&mut self, tab_id: &str) {
         self.known_tabs.remove(tab_id);
+    }
+
+    /// Validate a command only from the fixed, top-level privileged UI.
+    pub fn validate_command_from(
+        &mut self,
+        raw: &str,
+        caller: &IpcCallerContext,
+        expected_generation: u64,
+    ) -> Result<CommandEnvelope, IpcError> {
+        if caller.origin != PRIVILEGED_UI_ORIGIN {
+            return Err(CallerContextError::OriginDenied.into());
+        }
+        if caller.window_label != PRIVILEGED_UI_WINDOW {
+            return Err(CallerContextError::WindowDenied.into());
+        }
+        if !caller.top_level_frame {
+            return Err(CallerContextError::IframeDenied.into());
+        }
+        if caller.generation != expected_generation {
+            return Err(CallerContextError::StaleGeneration {
+                expected: expected_generation,
+                got: caller.generation,
+            }
+            .into());
+        }
+        self.validate_command(raw)
     }
 
     /// Validate a raw JSON command envelope from the Tauri frontend.
@@ -451,5 +543,43 @@ mod tests {
             bridge.validate_command(&raw),
             Err(IpcError::WrongTab { .. })
         ));
+    }
+
+    // --- Privileged caller context ---
+
+    #[test]
+    fn privileged_context_rejects_origin_window_iframe_and_generation_without_effect() {
+        let raw = make_command(UiCommand::NewTab, "req-context", None);
+        let cases = [
+            (
+                IpcCallerContext::new("https://attacker.example", "main", true, 7),
+                CallerContextError::OriginDenied,
+            ),
+            (
+                IpcCallerContext::new(PRIVILEGED_UI_ORIGIN, "settings", true, 7),
+                CallerContextError::WindowDenied,
+            ),
+            (
+                IpcCallerContext::new(PRIVILEGED_UI_ORIGIN, "main", false, 7),
+                CallerContextError::IframeDenied,
+            ),
+            (
+                IpcCallerContext::new(PRIVILEGED_UI_ORIGIN, "main", true, 6),
+                CallerContextError::StaleGeneration {
+                    expected: 7,
+                    got: 6,
+                },
+            ),
+        ];
+
+        for (caller, expected) in cases {
+            let mut bridge = IpcBridge::new();
+            assert_eq!(
+                bridge.validate_command_from(&raw, &caller, 7),
+                Err(IpcError::CallerContext(expected))
+            );
+            let trusted = IpcCallerContext::new(PRIVILEGED_UI_ORIGIN, "main", true, 7);
+            assert!(bridge.validate_command_from(&raw, &trusted, 7).is_ok());
+        }
     }
 }

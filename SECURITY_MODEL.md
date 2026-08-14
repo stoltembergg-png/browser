@@ -50,7 +50,7 @@ Regra: qualquer dado cruzando boundary é não confiável até schema, tamanho, 
 
 | Boundary | Controles obrigatórios | Residual risk / gate |
 |---|---|---|
-| UI ↔ core | commands allowlisted, typed schema, size limits, capability/window/tab scope, correlation IDs, no generic eval | bridge bug; fuzz + PR-024/045 |
+| UI ↔ core | commands allowlisted, typed schema, size limits, capability/window/tab/frame/generation scope, correlation IDs, no generic eval; PR-045 fixes local origin/window/frame/generation checks and an empty capability baseline | bridge bug; fuzz + PR-024/045 |
 | core ↔ engine | engine-api versioned, bounded channel, capability negotiation, stale generation checks, no Servo type leakage, runtime lifecycle contract | adapter drift/crash; PR-015/016/023/028 |
 | engine ↔ web | engine SOP/CORS/CSP/secure context/permissions; browser policy for scheme/download/popup | Servo gaps; WPT + compatibility gate |
 | core ↔ filesystem | brokered paths, profile root allowlist, canonicalization, atomic temp+rename, no page path | local privilege/profile theft; PR-040/044/046 |
@@ -71,12 +71,12 @@ Regra: qualquer dado cruzando boundary é não confiável até schema, tamanho, 
 
 ## 7. Tauri hardening
 
-- capabilities por janela/webview, com allowlist mínima;
+- capabilities por janela/webview, com allowlist mínima; PR-045 materializa `main-window` com `permissions: []`;
 - commands explícitos, sem `invoke` genérico para filesystem/process/shell;
-- CSP forte para frontend local, sem `unsafe-eval`/origins amplas salvo ADR comprovado;
+- CSP forte para frontend local, sem `unsafe-inline`/`unsafe-eval`/origins amplas salvo ADR comprovado; o fixture usa assets externos e `connect-src 'none'`;
 - não expor APIs/plugins de Tauri ao conteúdo web;
 - separar browser UI de page surface, mesmo que inicialmente compartilhando processo; declarar esse compartilhamento como risco, nunca como isolamento;
-- validar payload, caller context, window/tab ID e lifecycle state;
+- validar payload, caller context, window/tab/frame/generation ID e lifecycle state;
 - capability/CSP configuration lint e fixture hostil de negative IPC são requisitos do primeiro vertical slice, não controles adiados para Stable;
 - rejeitar comandos de origem, janela, iframe, perfil ou geração incompatíveis antes de qualquer efeito privilegiado;
 - updater configurado somente com chave pública e metadata assinada; a documentação do plugin updater requer atenção a assinatura e configuração do cliente.[7]
