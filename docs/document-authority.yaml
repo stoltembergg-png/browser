@@ -22,6 +22,7 @@ present:
   - docs/decisions/ADR-000-template.md
   - docs/specs/README.md
   - docs/specs/SPEC-000-template.md
+  - docs/specs/SPEC-030-tab-domain.md
   - docs/architecture-graph.yaml
   - docs/document-authority.yaml
   - docs/gates/release-gates.yaml
