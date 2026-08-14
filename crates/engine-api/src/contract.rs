@@ -74,6 +74,11 @@ impl EngineCapabilities {
                     operation: "set_viewport".into(),
                 })
             }
+            EngineCommand::Input { .. } if !self.can_receive_input => {
+                Err(EngineError::NotSupported {
+                    operation: "input".into(),
+                })
+            }
             _ => Ok(()),
         }
     }
@@ -103,6 +108,38 @@ pub struct EngineInstanceSpec {
 // Engine commands (core → engine)
 // ---------------------------------------------------------------------------
 
+/// A normalized pointer button accepted by the engine boundary.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PointerButton {
+    Left,
+    Middle,
+    Right,
+}
+
+/// Normalized input accepted by the first real-engine contract.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum InputEvent {
+    PointerMove {
+        x: i32,
+        y: i32,
+    },
+    PointerDown {
+        button: PointerButton,
+        x: i32,
+        y: i32,
+    },
+    PointerUp {
+        button: PointerButton,
+        x: i32,
+        y: i32,
+    },
+    Text {
+        text: String,
+    },
+}
+
 /// Typed commands the core sends to the engine.
 ///
 /// Each command corresponds to a `UiCommand` from the browser-domain but
@@ -122,6 +159,8 @@ pub enum EngineCommand {
     Stop,
     /// Resize the webview.
     SetViewport { width: u32, height: u32 },
+    /// Send normalized pointer or text input to the webview.
+    Input { event: InputEvent },
     /// Shutdown the engine instance.
     Shutdown,
 }

@@ -9,8 +9,8 @@
 //!   and contract testing. The stub implements `BrowserEngine` with
 //!   capability/`version`/`lifecycle` validation matching the FakeEngine.
 //! - `servo-backend`: Real adapter. Enables the `servo` crate dependency.
-//!   Requires system libraries (WebKitGTK, JSC, etc.) and a long build.
-//!   Not enabled in CI.
+//!   Requires system libraries and a long build. The dedicated `servo-real`
+//!   CI job exercises this feature with the non-vacuous fixture contract.
 //!
 //! ## Pin record
 //!
@@ -29,6 +29,11 @@ use engine_api::contract::{
     BrowserEngine, EngineCapabilities, EngineCommand, EngineDescriptor, EngineError,
     EngineInstanceId, EngineInstanceSpec, LifecycleState, ENGINE_API_VERSION,
 };
+
+#[cfg(feature = "servo-backend")]
+mod real;
+#[cfg(feature = "servo-backend")]
+pub use real::{RealServoAdapter, ServoEvidence, SERVO_SURFACE_STRATEGY};
 
 pub const PACKAGE_NAME: &str = "servo-engine";
 

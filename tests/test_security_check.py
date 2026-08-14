@@ -31,6 +31,18 @@ class SecurityCheckTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("secret-like", result.stderr)
 
+    def test_accepts_pinned_servo_sources(self) -> None:
+        lock = "\n".join(
+            [
+                'source = "git+https://github.com/servo/servo?rev=859bd5edd60c0fb162a1f73c083a23e55474faf7#859bd5edd60c0fb162a1f73c083a23e55474faf7"',
+                'source = "git+https://github.com/servo/stylo?rev=f6d1d525db9a7fb1aa0842926458e63faa4f44c7#f6d1d525db9a7fb1aa0842926458e63faa4f44c7"',
+            ]
+        )
+        temporary, root = self._workspace(lock)
+        self.addCleanup(temporary.cleanup)
+        result = subprocess.run([sys.executable, "scripts/security_check.py"], cwd=root, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_accepts_minimal_locked_workspace(self) -> None:
         temporary, root = self._workspace("[[package]]\nname = \"demo\"\nversion = \"0.1.0\"\n")
         self.addCleanup(temporary.cleanup)

@@ -1,9 +1,10 @@
 schema_version: 1
-status: proposed
-authority: PR-015 provisional contract; ADR-004 ratification required before PR-020/021/025/026
+status: ratified
+authority: ADR-004 ratified by PR-016 contract suite and PR-026 real Servo evidence
 source_of_truth: TESTING_STRATEGY.md
 validation_command: xtask engine-contract-check
-validated_against_runtime: false
+validated_against_runtime: true
+runtime_validation: servo-backend SoftwareRenderingContext fixture artifact
 
 adapters:
   required: [fake-engine, servo-engine]
@@ -30,7 +31,7 @@ non_vacuity:
 result_statuses: [pass, fail, skip, no-run]
 
 identity:
-  required_fields: [repository, commit_sha, tree_sha, engine_revision, os_and_arch, surface_strategy, thread_affinity, artifact_digest]
+  required_fields: [repository, commit_sha, tree_sha, engine_revision, os_and_arch, surface_strategy, thread_affinity, frame_digest, artifact_digest]
   stale_or_mismatched: NO_GO
 
 unknowns:

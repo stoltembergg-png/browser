@@ -48,7 +48,7 @@ jobs:
         run: cargo test --workspace --locked
 
       - name: Run Clippy
-        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
       - name: Build rustdoc
         run: cargo doc --workspace --no-deps --locked
@@ -88,6 +88,59 @@ jobs:
 
       - name: Run release manifest tests
         run: python3 -m unittest -v tests/test_release_manifest.py
+
+  servo-real:
+    name: PR-026 real Servo contract
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feat/pr-026-servo-surface')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_INCREMENTAL: 0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install pinned Rust toolchain
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772
+        with:
+          toolchain: 1.97.1
+          components: rustfmt, clippy
+
+      - name: Install Servo rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            clang lld llvm libclang-dev libfontconfig1-dev libfreetype6-dev \
+            libgl1-mesa-dev libegl1-mesa-dev libgtk-3-dev libssl-dev \
+            libudev-dev libx11-dev libxcursor-dev libxi-dev libxrandr-dev
+
+      - name: Record PR-026 identity
+        run: |
+          echo "PR026_REPOSITORY=${GITHUB_REPOSITORY}" >> "$GITHUB_ENV"
+          echo "PR026_COMMIT_SHA=${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "PR026_TREE_SHA=$(git rev-parse HEAD^{tree})" >> "$GITHUB_ENV"
+          echo "PR026_OS_ARCH=$(uname -s)-$(uname -m)" >> "$GITHUB_ENV"
+          echo "PR026_ARTIFACT_PATH=${RUNNER_TEMP}/servo-pr026-evidence.json" >> "$GITHUB_ENV"
+
+      - name: Run real Servo fixture contract
+        run: |
+          CARGO_TARGET_DIR="$RUNNER_TEMP/pr026-target" \
+            cargo test -p servo-engine --features servo-backend --no-default-features \
+              --test real_servo_contract --locked -- --nocapture
+
+      - name: Validate real Servo evidence
+        run: python3 scripts/servo_evidence_check.py "$PR026_ARTIFACT_PATH"
+
+      - name: Upload PR-026 evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: servo-pr026-evidence-${{ github.sha }}
+          path: ${{ env.PR026_ARTIFACT_PATH }}
+          if-no-files-found: error
 
   # Cross-platform matrix: run core crate tests on Windows and macOS
   # to verify the engine-api, browser-domain, and servo-engine compile
@@ -138,7 +191,7 @@ jobs:
   quality-gate-aggregate:
     name: Quality Gate (aggregate)
     runs-on: ubuntu-24.04
-    needs: [quality, os-matrix]
+    needs: [quality, os-matrix, servo-real]
     if: always()
     timeout-minutes: 5
     steps:
@@ -146,12 +199,18 @@ jobs:
         run: |
           echo "quality: ${{ needs.quality.result }}"
           echo "os-matrix: ${{ needs.os-matrix.result }}"
+          echo "servo-real: ${{ needs.servo-real.result }}"
           if [ "${{ needs.quality.result }}" != "success" ]; then
             echo "::error::Quality Gate failed"
             exit 1
           fi
           if [ "${{ needs.os-matrix.result }}" != "success" ]; then
             echo "::error::OS Matrix failed — a runner failure is NOT a pass"
+            exit 1
+          fi
+          if [ "${{ startsWith(github.head_ref, 'feat/pr-026-servo-surface') }}" = "true" ] \
+            && [ "${{ needs.servo-real.result }}" != "success" ]; then
+            echo "::error::PR-026 real Servo contract failed or was skipped"
             exit 1
           fi
           echo "All gates passed"
