@@ -52,6 +52,18 @@ impl RoutedEngineEvent {
             event,
         }
     }
+
+    pub fn tab_id(&self) -> &TabId {
+        &self.tab_id
+    }
+
+    pub fn binding(&self) -> &TabBinding {
+        &self.binding
+    }
+
+    pub fn event(&self) -> &EngineEvent {
+        &self.event
+    }
 }
 
 /// Errors returned by tab collection and event routing operations.
@@ -116,6 +128,15 @@ impl TabManager {
 
     pub fn binding(&self, tab_id: &TabId) -> Option<&TabBinding> {
         self.bindings.get(tab_id)
+    }
+
+    pub fn live_tab_ids(&self) -> Vec<TabId> {
+        self.tabs
+            .iter()
+            .filter_map(|(tab_id, tab)| {
+                (tab.lifecycle() != TabLifecycle::Closed).then_some(tab_id.clone())
+            })
+            .collect()
     }
 
     pub fn create_tab(

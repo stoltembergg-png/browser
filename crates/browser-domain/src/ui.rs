@@ -61,7 +61,7 @@ pub enum UiCommand {
     /// User requested a new tab.
     NewTab,
     /// User closed a tab.
-    CloseTab,
+    CloseTab { target_tab_id: TabId },
     /// User selected a different tab.
     SelectTab { target_tab_id: TabId },
 }

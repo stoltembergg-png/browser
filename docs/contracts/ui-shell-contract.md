@@ -43,6 +43,7 @@ Every command is wrapped in a `CommandEnvelope`:
 - Wrong schema version → `CommandRejected { reason: "unsupported version" }`
 - Empty URL → `CommandRejected { reason: "URL must not be empty" }`
 - Oversized URL → `CommandRejected { reason: "URL exceeds maximum length" }`
+- Scoped `close_tab`/`select_tab` target different from envelope `tab_id` → `TargetMismatch`
 
 ## Events (core → UI)
 
@@ -80,6 +81,12 @@ Every event is wrapped in an `EventEnvelope`:
 The shell renders tab records as `button[role="tab"]` controls inside the `tablist`, with a separate labeled close button for each record. The selected tab has `aria-selected="true"` and `tabindex="0"`; inactive tabs use roving `tabindex="-1"`. Arrow keys, Home and End move focus and send the typed `select_tab` command. The selected tab labels the shared `tabpanel` through `aria-labelledby` and `aria-controls="tab-panel"`.
 
 Unknown/stale tab IDs are ignored without creating UI state. Closing the active tab selects an existing fallback record, or clears the panel label and omnibox when no record remains. This is a presentation contract only; browser-core remains the source of truth for tab lifecycle and selection.
+## PR-033 command-to-manager integration
+
+`TabUiCoordinator` is the engine-neutral integration seam used by tests and future Tauri adapters. It validates the envelope through `IpcBridge`, applies `new_tab`, `close_tab`, and `select_tab` to `TabManager`, and emits typed `EventEnvelope` records using the same `tab_id`. Navigation start and engine events carry the target tab binding; a binding for another tab or engine incarnation is rejected before state mutation.
+
+The coordinator keeps closed tab records as manager tombstones, unregisters them from the IPC allowlist, and selects a live fallback only when the closed tab was active. Engine-host commands (`reload`, back, forward and stop) remain outside this slice and are not claimed as implemented here.
+
 ## Security constraints
 
 - There is **no** generic `invoke` bridge. Every command is a named, typed variant.
