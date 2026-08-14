@@ -1,5 +1,10 @@
 #![forbid(unsafe_code)]
 
+//! Engine-neutral test support: shared fixtures and the MVP smoke harness
+//! with bound evidence (PR-029).
+
+pub mod smoke;
+
 pub const PACKAGE_NAME: &str = "test-support";
 
 #[cfg(test)]

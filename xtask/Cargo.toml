@@ -10,3 +10,7 @@ workspace = true
 [[bin]]
 name = "xtask"
 path = "src/main.rs"
+
+[dependencies]
+test-support = { path = "../crates/test-support" }
+engine-api.workspace = true

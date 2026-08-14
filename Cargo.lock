@@ -3181,8 +3181,10 @@ dependencies = [
 name = "test-support"
 version = "0.1.0"
 dependencies = [
+ "browser-core",
  "browser-domain",
  "engine-api",
+ "serde_json",
 ]
 
 [[package]]
@@ -4283,6 +4285,10 @@ dependencies = [
 [[package]]
 name = "xtask"
 version = "0.1.0"
+dependencies = [
+ "engine-api",
+ "test-support",
+]
 
 [[package]]
 name = "yoke"
