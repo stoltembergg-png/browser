@@ -53,7 +53,7 @@ Regra: qualquer dado cruzando boundary é não confiável até schema, tamanho, 
 | UI ↔ core | commands allowlisted, typed schema, size limits, capability/window/tab scope, correlation IDs, no generic eval | bridge bug; fuzz + PR-024/045 |
 | core ↔ engine | engine-api versioned, bounded channel, capability negotiation, stale generation checks, no Servo type leakage, runtime lifecycle contract | adapter drift/crash; PR-015/016/023/028 |
 | engine ↔ web | engine SOP/CORS/CSP/secure context/permissions; browser policy for scheme/download/popup | Servo gaps; WPT + compatibility gate |
-| core ↔ filesystem | brokered paths, profile root allowlist, canonicalization, atomic temp+rename, no page path | local privilege/profile theft; PR-040/044/046 |
+| core ↔ filesystem | brokered paths, profile root allowlist, canonicalization, atomic temp+rename, no page path; PR-040 enforces filename/path/quota/quarantine/cancel policy | local privilege/profile theft; PR-044/046 |
 | core ↔ keychain | OS keychain abstraction, no plaintext credential fallback without ADR | OS-specific failure; PR-037 |
 | CI ↔ PR | no secrets for fork, SHA-pinned actions, least token permissions, artifact identity validation, no `pull_request_target` code execution | GitHub policy drift; PR-006/008/010 |
 | release ↔ client | signed artifacts/update metadata, key separation, provenance/SBOM, downgrade/channel checks, rollback | key compromise; PR-059/060 |
@@ -104,6 +104,7 @@ Default deny para capacidades sensíveis. Grants são por origin/profile/context
 ## 9. Downloads
 
 - request começa como pending; sem path controlado pela página;
+- PR-040 usa um broker preso ao profile/root canonicalizado; metadata do engine não escolhe diretórios;
 - filename sanitizado e limitado; separadores, ADS, device names e traversal bloqueados por OS;
 - escreve em temp directory não executável quando possível;
 - finaliza com rename atômico, quota e collision policy;
