@@ -4,6 +4,7 @@
 pub const PACKAGE_NAME: &str = "browser-domain";
 
 pub mod ids;
+pub mod profile;
 pub mod session;
 pub mod tab;
 pub mod ui;
