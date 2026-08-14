@@ -1,9 +1,10 @@
 #![forbid(unsafe_code)]
 
-/// Stable identifier types will be added by a later domain slice.
+/// Pure browser-domain state and value objects.
 pub const PACKAGE_NAME: &str = "browser-domain";
 
 pub mod ids;
+pub mod tab;
 pub mod ui;
 
 #[cfg(test)]
