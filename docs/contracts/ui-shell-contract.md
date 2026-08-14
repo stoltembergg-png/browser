@@ -1,6 +1,6 @@
 # UI Shell Contract — PR-012
 
-> Status: implemented M1 shell mock, extended by PR-032 tab-strip presentation. This contract defines the typed command/event schema and accessibility boundary between the privileged Tauri frontend and the browser core. It does not implement browser state or engine behavior.
+> Status: implemented M1 shell mock, extended by PR-032 tab-strip presentation and PR-041 download UI state. This contract defines the typed command/event schema and accessibility boundary between the privileged Tauri frontend and the browser core. It does not implement browser state or engine behavior.
 
 ## Objective
 
@@ -35,6 +35,11 @@ Every command is wrapped in a `CommandEnvelope`:
 | `new_tab` | — | Create a new tab |
 | `close_tab` | `target_tab_id: TabId` | Close the specified tab |
 | `select_tab` | `target_tab_id: TabId` | Switch to the specified tab |
+| `download_start` | `url: String, suggested_name: String, content_length: Option<u64>` | App-level; the policy decides the destination |
+| `download_cancel` | `download_id: u64` | App-level; cancel an active download |
+| `download_retry` | `download_id: u64` | App-level; restart a failed/cancelled download |
+
+Download commands are app-level (no `tab_id`) because a download is bound to the profile, not to a tab. The `suggested_name` is metadata only — the destination is decided by the brokered download policy in core, never by the UI.
 
 ### Rejection rules
 
@@ -67,6 +72,11 @@ Every event is wrapped in an `EventEnvelope`:
 | `navigation_finished` | `url: String` | Navigation completed |
 | `navigation_failed` | `reason: String` | Navigation failed |
 | `title_changed` | `title: String` | Page title changed (≤ 1024 bytes) |
+| `download_started` | `download_id: u64, suggested_name: String` | Download began streaming |
+| `download_progress` | `download_id: u64, bytes: u64` | Bytes streamed so far |
+| `download_completed` | `download_id: u64, final_path: String` | Safe final path reached |
+| `download_failed` | `download_id: u64, reason: String` | Failed (reason ≤ 1024 bytes) |
+| `download_cancelled` | `download_id: u64` | Cancelled by user or broker |
 | `command_rejected` | `reason: String` | Core rejected a command |
 
 ### Rejection rules
@@ -86,6 +96,12 @@ Unknown/stale tab IDs are ignored without creating UI state. Closing the active 
 `TabUiCoordinator` is the engine-neutral integration seam used by tests and future Tauri adapters. It validates the envelope through `IpcBridge`, applies `new_tab`, `close_tab`, and `select_tab` to `TabManager`, and emits typed `EventEnvelope` records using the same `tab_id`. Navigation start and engine events carry the target tab binding; a binding for another tab or engine incarnation is rejected before state mutation.
 
 The coordinator keeps closed tab records as manager tombstones, unregisters them from the IPC allowlist, and selects a live fallback only when the closed tab was active. Engine-host commands (`reload`, back, forward and stop) remain outside this slice and are not claimed as implemented here.
+
+## PR-041 download UI state
+
+`DownloadUiCoordinator` is the engine-neutral seam for download presentation state. It validates app-level download commands through `IpcBridge`, applies them to `DownloadManager` (which wraps the brokered `DownloadBroker`), and emits typed download events. `download_start` never accepts a destination — the final path is allocated by the broker policy from the profile root, so the UI cannot change destination after policy. Active downloads track streamed bytes; `download_cancel` removes the temporary part, and `download_retry` restarts a failed/cancelled download from its history record with a fresh id. Terminal records (completed, cancelled, failed) are kept in a bounded history (50 entries, most recent first).
+
+On (re)start the broker recovers the download root: orphaned `.part` temporary files from an interrupted session are removed and the id sequence advances past any previously used id. Completed files are never touched, and interrupted downloads never become final files.
 
 ## Security constraints
 

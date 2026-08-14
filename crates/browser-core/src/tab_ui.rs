@@ -89,6 +89,11 @@ impl TabUiCoordinator {
                     "engine command handled by the engine-host adapter",
                 ))
             }
+            UiCommand::DownloadStart { .. }
+            | UiCommand::DownloadCancel { .. }
+            | UiCommand::DownloadRetry { .. } => Err(CoordinatorError::UnsupportedCommand(
+                "download command handled by the download coordinator",
+            )),
         }
     }
 

@@ -8,6 +8,8 @@
 
 pub mod crash_recovery;
 pub mod download_broker;
+pub mod download_manager;
+pub mod download_ui;
 pub mod engine_host;
 pub mod ipc_bridge;
 pub mod lifecycle;

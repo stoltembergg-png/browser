@@ -217,6 +217,11 @@ pub struct DownloadBroker {
 
 impl DownloadBroker {
     /// Create a broker whose root is canonicalized and owned by one profile.
+    ///
+    /// On (re)start the broker recovers the root: temporary `.part` files left
+    /// by an interrupted session are removed and the download id sequence is
+    /// advanced past any previously used id. Completed files are never
+    /// touched.
     pub fn new(
         root: impl AsRef<Path>,
         profile_id: ProfileId,
@@ -226,12 +231,13 @@ impl DownloadBroker {
             .map_err(|error| io_error("create download root", error))?;
         let root = fs::canonicalize(root.as_ref())
             .map_err(|error| io_error("canonicalize download root", error))?;
+        let next_id = Self::recover_root(&root)?;
         Ok(Self {
             root,
             profile_id,
             max_bytes,
             quarantine: false,
-            next_id: 1,
+            next_id,
             active: HashMap::new(),
         })
     }
@@ -357,6 +363,10 @@ impl DownloadBroker {
         self.active.len()
     }
 
+    pub fn root(&self) -> &Path {
+        &self.root
+    }
+
     fn final_root(&self) -> Result<PathBuf, DownloadError> {
         let root = if self.quarantine {
             self.root.join(".quarantine")
@@ -365,6 +375,39 @@ impl DownloadBroker {
         };
         fs::create_dir_all(&root).map_err(|error| io_error("create download final root", error))?;
         Ok(root)
+    }
+
+    /// Remove orphaned temporary parts and return the next download id.
+    ///
+    /// Called on construction so a restart never collides with a `.part`
+    /// left by an interrupted session. Completed files are never touched.
+    fn recover_root(root: &Path) -> Result<u64, DownloadError> {
+        let mut max_seen = 0u64;
+        let entries = fs::read_dir(root)
+            .map_err(|error| io_error("read download root during recovery", error))?;
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let name = match path.file_name().and_then(|name| name.to_str()) {
+                Some(name) => name,
+                None => continue,
+            };
+            let Some(id) = name
+                .strip_prefix(".browser-download-")
+                .and_then(|rest| rest.strip_suffix(".part"))
+                .and_then(|digits| digits.parse::<u64>().ok())
+            else {
+                continue;
+            };
+            max_seen = max_seen.max(id);
+            match fs::remove_file(&path) {
+                Ok(()) => {}
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => {
+                    return Err(io_error("remove orphaned download part", error));
+                }
+            }
+        }
+        Ok(max_seen.saturating_add(1))
     }
 
     fn allocate_final_path(&self, root: &Path, filename: &str) -> Result<PathBuf, DownloadError> {
