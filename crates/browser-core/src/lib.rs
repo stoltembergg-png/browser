@@ -7,6 +7,7 @@
 //! contract defined in ADR-005 and `docs/contracts/runtime-lifecycle.md`.
 
 pub mod crash_recovery;
+pub mod diagnostics;
 pub mod download_broker;
 pub mod download_manager;
 pub mod download_ui;
