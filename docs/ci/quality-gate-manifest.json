@@ -17,6 +17,8 @@
     "Check security baseline",
     "Run threat regression gate tests",
     "Validate threat regression manifest",
+    "PR-026 real Servo contract",
+    "Validate real Servo evidence",
     "Check architecture graph",
     "Run MVP smoke harness",
     "Check quality-gate evidence manifest",

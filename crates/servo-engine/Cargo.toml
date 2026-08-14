@@ -11,23 +11,62 @@ workspace = true
 [dependencies]
 engine-api.workspace = true
 
-# The `servo-backend` feature enables the real Servo dependency.
-# When disabled (default for CI), the adapter uses stub types.
-#
-# To enable the real adapter locally, add this to the [dependencies] section:
-#
-#   [dependencies.servo]
-#   version = "0.5"
-#   git = "https://github.com/servo/servo"
-#   rev = "859bd5edd60c0fb162a1f73c083a23e55474faf7"
-#   optional = true
-#
-# And add `servo-backend = ["dep:servo"]` to [features].
-# This requires system libraries: libwebkit2gtk-4.1-dev, JavaScriptCore, etc.
+[dependencies.servo]
+git = "https://github.com/servo/servo"
+rev = "859bd5edd60c0fb162a1f73c083a23e55474faf7"
+package = "servo"
+optional = true
+default-features = false
+
+[dependencies.servo-default-resources]
+git = "https://github.com/servo/servo"
+rev = "859bd5edd60c0fb162a1f73c083a23e55474faf7"
+package = "servo-default-resources"
+optional = true
+
+[dependencies.embedder_traits]
+git = "https://github.com/servo/servo"
+rev = "859bd5edd60c0fb162a1f73c083a23e55474faf7"
+package = "servo-embedder-traits"
+optional = true
+
+[dependencies.dpi]
+version = "0.1.2"
+optional = true
+
+[dependencies.euclid]
+version = "0.22.11"
+optional = true
+
+[dependencies.keyboard-types]
+version = "0.8.3"
+optional = true
+
+[dependencies.url]
+version = "2.5.7"
+optional = true
+
+[dependencies.serde_json]
+version = "1.0.151"
+optional = true
+
+[dependencies.sha2]
+version = "0.11.0"
+optional = true
 
 [features]
 default = []
-# servo-backend = ["dep:servo"]
+servo-backend = [
+    "dep:servo",
+    "dep:servo-default-resources",
+    "dep:embedder_traits",
+    "dep:dpi",
+    "dep:euclid",
+    "dep:keyboard-types",
+    "dep:url",
+    "dep:serde_json",
+    "dep:sha2",
+]
 
 [lib]
 path = "src/lib.rs"

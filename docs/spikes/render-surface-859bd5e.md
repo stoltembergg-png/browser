@@ -11,7 +11,7 @@ Prove that Servo's `RenderingContext` trait and its implementations (`WindowRend
 
 ## Method
 
-Static analysis of the `RenderingContext` trait and its three concrete implementations in `components/shared/paint/rendering_context.rs` at revision `859bd5e`. No native compilation — the spike documents API surface, threading constraints, and failure modes.
+Static analysis of the `RenderingContext` trait and its three concrete implementations in `components/shared/paint/rendering_context.rs` at revision `859bd5e`. The native embedding validation is implemented separately by PR-026 in `crates/servo-engine/src/real.rs` and exercised by `tests/real_servo_contract.rs`; this report retains the original API-surface analysis and failure modes.
 
 ## API Findings
 
@@ -102,7 +102,8 @@ impl WebViewDelegate {
     fn notify_new_frame_ready(&self, webview: WebView) {
         // Embedder should:
         // 1. Call webview.paint() to render to the RenderingContext
-        // 2. Call rendering_context.present() to swap buffers
+        // 2. Read the back buffer for frame evidence before present()
+        // 3. Call rendering_context.present() to swap buffers
     }
 }
 ```
@@ -178,10 +179,22 @@ impl Drop for SoftwareRenderingContext {
 |---|---|---|
 | Context creation fails | No GPU, no display, no GL drivers | Fall back to `SoftwareRenderingContext` |
 | present() after Drop | WebView not dropped before context | Engine host shutdown barrier: drop webviews first |
-| Late wake | EventLoopWaker fires after shutdown | `spin_event_loop` returns `false` after shutdown |
-| Pending frame at shutdown | `notify_new_frame_ready` queued but not processed | Drain event loop until `spin_event_loop` returns `false` |
+| Late wake | EventLoopWaker fires after shutdown | Stop pumping after the WebView is dropped and let Servo's Drop complete |
+| Pending frame at shutdown | `notify_new_frame_ready` queued but not processed | Wait for `take_screenshot` readiness before input; drop WebViews before Servo |
 | Resize race | Multiple resizes in flight | Coalesce on engine thread (last-value-wins) |
 | Offscreen creation fails | Parent context lost | Re-create parent context; webviews are cheap to recreate |
+
+## Native validation follow-up (PR-026)
+
+The pinned Servo integration was compiled and executed with:
+
+```text
+cargo check -p servo-engine --features servo-backend --no-default-features --locked
+cargo test -p servo-engine --features servo-backend --no-default-features --test real_servo_contract --locked
+python3 scripts/servo_evidence_check.py <artifact>
+```
+
+The non-vacuous contract uses `SoftwareRenderingContext`, a local HTTP fixture, `take_screenshot` readiness, pointer/text input, link navigation, resize, thread-affinity checks, and ordered shutdown. The machine-readable artifact is governed by `docs/contracts/servo-real-evidence.schema.json`.
 
 ## Conclusion
 

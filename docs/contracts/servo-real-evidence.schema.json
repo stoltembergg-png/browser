@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PR-026 Servo real evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "repository",
+    "commit_sha",
+    "tree_sha",
+    "servo_revision",
+    "engine_revision",
+    "os_and_arch",
+    "surface_strategy",
+    "thread_affinity",
+    "artifact_digest",
+    "frame_digest",
+    "frame_non_blank",
+    "load_complete",
+    "screenshot_ready",
+    "frame_count",
+    "cases"
+  ],
+  "properties": {
+    "status": {"const": "pass"},
+    "repository": {"type": "string", "minLength": 1},
+    "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "servo_revision": {"const": "859bd5edd60c0fb162a1f73c083a23e55474faf7"},
+    "engine_revision": {"const": "859bd5edd60c0fb162a1f73c083a23e55474faf7"},
+    "os_and_arch": {"type": "string", "minLength": 1},
+    "surface_strategy": {"const": "software-rendering-context"},
+    "thread_affinity": {"const": "engine-thread-only"},
+    "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "frame_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "frame_non_blank": {"const": true},
+    "load_complete": {"const": true},
+    "screenshot_ready": {"const": true},
+    "frame_count": {"type": "integer", "minimum": 1},
+    "cases": {
+      "type": "object",
+      "additionalProperties": {"const": "pass"},
+      "required": [
+        "http_fixture_load",
+        "frame_ready_paint_present",
+        "text_input",
+        "click_link",
+        "resize",
+        "thread_affinity",
+        "shutdown_no_deadlock"
+      ]
+    }
+  }
+}

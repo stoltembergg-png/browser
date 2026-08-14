@@ -9,6 +9,20 @@ import sys
 from pathlib import Path
 
 
+SERVO_GIT_SOURCES = {
+    'git+https://github.com/servo/servo?rev=859bd5edd60c0fb162a1f73c083a23e55474faf7#859bd5edd60c0fb162a1f73c083a23e55474faf7',
+    'git+https://github.com/servo/stylo?rev=f6d1d525db9a7fb1aa0842926458e63faa4f44c7#f6d1d525db9a7fb1aa0842926458e63faa4f44c7',
+}
+
+
+def git_source_violations(lock_text: str) -> list[str]:
+    violations = []
+    for source in re.findall(r'(?m)^source\s*=\s*"(git\+[^"]+)"', lock_text):
+        if source not in SERVO_GIT_SOURCES:
+            violations.append(f"unapproved git source in Cargo.lock: {source}")
+    return violations
+
+
 def main() -> int:
     root = Path.cwd()
     lockfile = root / "Cargo.lock"
@@ -17,9 +31,7 @@ def main() -> int:
         return 1
 
     lock_text = lockfile.read_text()
-    violations: list[str] = []
-    if re.search(r"(?m)^source\s*=\s*\"git\+", lock_text):
-        violations.append("git source in Cargo.lock")
+    violations: list[str] = git_source_violations(lock_text)
 
     secret_patterns = (
         r"gh[pousr]_[A-Za-z0-9_]{20,}",
