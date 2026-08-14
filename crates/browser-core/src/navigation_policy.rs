@@ -45,6 +45,7 @@ pub enum PolicyError {
     HandlerNotAllowed,
     Traversal,
     NullByte,
+    InvalidPath,
     NotConfigured,
     Malformed(String),
 }
@@ -63,6 +64,9 @@ impl fmt::Display for PolicyError {
             Self::HandlerNotAllowed => formatter.write_str("external handler not allowlisted"),
             Self::Traversal => formatter.write_str("path escapes the allowed root"),
             Self::NullByte => formatter.write_str("null byte in path"),
+            Self::InvalidPath => {
+                formatter.write_str("path contains a platform separator or drive prefix")
+            }
             Self::NotConfigured => formatter.write_str("file access is not configured"),
             Self::Malformed(reason) => write!(formatter, "malformed URL: {reason}"),
         }
@@ -98,6 +102,63 @@ fn classify_scheme(scheme: &str) -> Scheme {
     }
 }
 
+fn valid_host_labels(host: &str) -> bool {
+    if host.is_empty() || !host.is_ascii() {
+        return false;
+    }
+    host.split('.').all(|label| {
+        !label.is_empty()
+            && !label.starts_with('-')
+            && !label.ends_with('-')
+            && label
+                .bytes()
+                .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-')
+    })
+}
+
+fn parse_port(text: &str) -> Result<u16, PolicyError> {
+    if text.is_empty() {
+        return Err(PolicyError::InvalidPort);
+    }
+    let value: u16 = text.parse().map_err(|_| PolicyError::InvalidPort)?;
+    if value == 0 {
+        return Err(PolicyError::InvalidPort);
+    }
+    Ok(value)
+}
+
+fn split_authority(authority: &str) -> Result<(String, Option<u16>), PolicyError> {
+    if authority.starts_with('[') {
+        let close = authority.find(']').ok_or(PolicyError::InvalidHost)?;
+        let host = &authority[..=close];
+        let ipv6 = &host[1..host.len() - 1];
+        if ipv6.is_empty() || ipv6.parse::<std::net::Ipv6Addr>().is_err() {
+            return Err(PolicyError::InvalidHost);
+        }
+        let remainder = &authority[close + 1..];
+        let port = if remainder.is_empty() {
+            None
+        } else if let Some(port_text) = remainder.strip_prefix(':') {
+            Some(parse_port(port_text)?)
+        } else {
+            return Err(PolicyError::InvalidHost);
+        };
+        return Ok((host.to_string(), port));
+    }
+
+    if authority.contains(['[', ']']) || authority.matches(':').count() > 1 {
+        return Err(PolicyError::InvalidHost);
+    }
+    let (host, port) = match authority.split_once(':') {
+        Some((host, port)) => (host, Some(parse_port(port)?)),
+        None => (authority, None),
+    };
+    if !valid_host_labels(host) {
+        return Err(PolicyError::InvalidHost);
+    }
+    Ok((host.to_string(), port))
+}
+
 /// Conservative URL parser: validates structure without a third-party crate.
 pub fn parse_url(raw: &str) -> Result<ParsedUrl, PolicyError> {
     if raw.is_empty() || has_control_or_space(raw) {
@@ -127,24 +188,8 @@ pub fn parse_url(raw: &str) -> Result<ParsedUrl, PolicyError> {
             if authority.bytes().any(|byte| byte <= 0x20) {
                 return Err(PolicyError::InvalidHost);
             }
-            let (host_part, port_part) = match authority.rfind(':') {
-                Some(colon_pos) => (&authority[..colon_pos], Some(&authority[colon_pos + 1..])),
-                None => (authority, None),
-            };
-            if host_part.is_empty() {
-                return Err(PolicyError::InvalidHost);
-            }
-            let port = match port_part {
-                Some(text) => {
-                    let value: u16 = text.parse().map_err(|_| PolicyError::InvalidPort)?;
-                    if value == 0 {
-                        return Err(PolicyError::InvalidPort);
-                    }
-                    Some(value)
-                }
-                None => None,
-            };
-            (Some(host_part.to_string()), port)
+            let (host, port) = split_authority(authority)?;
+            (Some(host), port)
         }
         _ => (None, None),
     };
@@ -274,11 +319,21 @@ impl FileAccessPolicy {
         let Some(root) = &self.allowed_root else {
             return FileAccess::Denied(PolicyError::NotConfigured);
         };
-        let decoded = url_path.replace("%2F", "/").replace("%2f", "/");
-        let decoded = decoded.replace("%2E", ".").replace("%2e", ".");
-        let decoded = decoded.replace("%00", "\0");
+        let decoded = url_path
+            .replace("%2F", "/")
+            .replace("%2f", "/")
+            .replace("%2E", ".")
+            .replace("%2e", ".")
+            .replace("%5C", "\\")
+            .replace("%5c", "\\")
+            .replace("%3A", ":")
+            .replace("%3a", ":")
+            .replace("%00", "\0");
         if decoded.contains('\0') {
             return FileAccess::Denied(PolicyError::NullByte);
+        }
+        if decoded.contains('\\') || decoded.contains(':') {
+            return FileAccess::Denied(PolicyError::InvalidPath);
         }
 
         let mut out = PathBuf::from(root);

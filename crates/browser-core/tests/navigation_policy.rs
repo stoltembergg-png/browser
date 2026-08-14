@@ -309,3 +309,51 @@ fn file_without_scheme_is_not_an_error_path() {
         FileAccess::Allowed(_)
     ));
 }
+
+#[test]
+fn parses_bracketed_ipv6_authority_and_port() {
+    let parsed = browser_core::navigation_policy::parse_url("https://[2001:db8::1]:8443/path")
+        .expect("parse");
+    assert_eq!(parsed.scheme, Scheme::Https);
+    assert_eq!(parsed.host.as_deref(), Some("[2001:db8::1]"));
+    assert_eq!(parsed.port, Some(8443));
+}
+
+#[test]
+fn rejects_unbracketed_ipv6_authority() {
+    assert!(matches!(
+        browser_core::navigation_policy::parse_url("https://2001:db8::1/path"),
+        Err(PolicyError::InvalidHost)
+    ));
+}
+
+#[test]
+fn rejects_malformed_host_labels() {
+    for url in [
+        "https://-example.com",
+        "https://example-.com",
+        "https://example..com",
+    ] {
+        assert!(matches!(
+            browser_core::navigation_policy::parse_url(url),
+            Err(PolicyError::InvalidHost)
+        ));
+    }
+}
+
+#[test]
+fn file_windows_separators_and_drive_prefixes_are_denied() {
+    let root = temp_root("windows-path");
+    let policy = FileAccessPolicy::new(root);
+    for path in [
+        "..\\\\secret",
+        "nested\\\\..\\\\secret",
+        "C:%2Fsecret",
+        "x%5Cy",
+    ] {
+        assert!(
+            matches!(policy.resolve(path), FileAccess::Denied(_)),
+            "expected denial for {path:?}"
+        );
+    }
+}
