@@ -155,6 +155,11 @@ impl<R: HistoryRepository> HistoryManager<R> {
     pub fn count(&self, profile_id: &ProfileId) -> usize {
         self.repository.count(profile_id)
     }
+
+    /// Consume the manager and return the underlying repository.
+    pub fn into_repository(self) -> R {
+        self.repository
+    }
 }
 
 /// In-memory history repository for testing.
