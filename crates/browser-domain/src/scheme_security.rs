@@ -169,6 +169,54 @@ impl Default for SchemeBroker {
     }
 }
 
+/// Decisão para um handler de protocolo externo (mailto:, custom:, etc.).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ExternalAction {
+    /// Handler allowlisted e argumentos seguros: pode abrir.
+    OpenAllowed,
+    /// Handler não allowlisted: exige confirmação explícita do usuário.
+    RequiresConfirmation,
+    /// Handler ou argumentos rejeitados.
+    Denied,
+}
+
+/// Caracteres que nunca podem aparecer em handler/args de protocolo externo:
+/// impedem shell interpolation e command injection.
+const SHELL_METACHARS: &[char] = &[';', '&', '|', '<', '>', '`', '$', '(', ')', '{', '}', '\n'];
+
+/// Política de protocolos externos: allowlist explícita, nomes alfanuméricos,
+/// sem shell interpolation, confirmação opcional. Sem launcher de OS.
+pub struct ExternalProtocolPolicy {
+    allowed_handlers: HashSet<String>,
+    require_confirmation: bool,
+}
+
+impl ExternalProtocolPolicy {
+    pub fn new(allowed_handlers: HashSet<String>, require_confirmation: bool) -> Self {
+        Self {
+            allowed_handlers,
+            require_confirmation,
+        }
+    }
+
+    pub fn evaluate(&self, handler: &str, args: &str) -> ExternalAction {
+        if handler.is_empty()
+            || !handler.chars().all(|ch| ch.is_ascii_alphanumeric())
+            || handler.chars().any(|ch| SHELL_METACHARS.contains(&ch))
+            || args.chars().any(|ch| SHELL_METACHARS.contains(&ch))
+        {
+            return ExternalAction::Denied;
+        }
+        if self.allowed_handlers.contains(handler) {
+            ExternalAction::OpenAllowed
+        } else if self.require_confirmation {
+            ExternalAction::RequiresConfirmation
+        } else {
+            ExternalAction::Denied
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -381,5 +429,56 @@ mod tests {
                 reason: DenyReason::UnknownScheme { .. }
             }
         ));
+    }
+
+    // --- External protocol policy ---
+
+    fn handler_set(handlers: &[&str]) -> HashSet<String> {
+        handlers.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn allowlisted_handler_with_clean_args_opens() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&["mailto"]), false);
+        assert_eq!(
+            policy.evaluate("mailto", "user@example.com?subject=hello"),
+            ExternalAction::OpenAllowed
+        );
+    }
+
+    #[test]
+    fn allowlisted_handler_with_shell_metachar_denied() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&["mailto"]), false);
+        assert_eq!(
+            policy.evaluate("mailto", "user@example.com; rm -rf /"),
+            ExternalAction::Denied
+        );
+    }
+
+    #[test]
+    fn non_allowlisted_handler_requires_confirmation() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&[]), true);
+        assert_eq!(
+            policy.evaluate("slack", "channels"),
+            ExternalAction::RequiresConfirmation
+        );
+    }
+
+    #[test]
+    fn confirmation_off_denies_non_allowlisted() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&[]), false);
+        assert_eq!(policy.evaluate("slack", "channels"), ExternalAction::Denied);
+    }
+
+    #[test]
+    fn handler_with_metachar_denied() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&["mailto"]), true);
+        assert_eq!(policy.evaluate("mail;to", "x"), ExternalAction::Denied);
+    }
+
+    #[test]
+    fn empty_handler_denied() {
+        let policy = ExternalProtocolPolicy::new(handler_set(&[]), true);
+        assert_eq!(policy.evaluate("", "x"), ExternalAction::Denied);
     }
 }
