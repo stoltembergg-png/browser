@@ -143,6 +143,8 @@ Default deny para capacidades sensíveis. PR-042 mantém grants por `requesting_
 
 `tracing` estruturado com campos de categoria, request/tab/profile IDs derivados e timestamps monotônicos. Redaction antes do sink: URLs podem conter credentials/query secrets; page text, cookies, headers, paths e tokens nunca entram por padrão. Crash report é opt-in, mínimo e local primeiro. Telemetry de produto é opt-in até decisão formal; nenhuma coleta silenciosa é assumida.
 
+PR-047 materializa o modelo: `browser-core::diagnostics` com `RedactionConfig` (allowlist de campos; campos fora da allowlist são `[redacted]`), redação golden por valor (userinfo/query/fragment de URLs, tokens/secrets, paths de usuário, conteúdo de página), `TelemetryGate` (opt-in; nada é coletado sem ele) e `CrashBundle` local (JSON redigido, sem campos de upload/cloud). Sempre-redigido: PII, page content, cookies, tokens.
+
 Diagnostics bundle deve permitir investigação sem profile completo: versões, OS/arch, engine revision, feature flags, queue states, error codes, counts e hashes de artifacts. PII e conteúdo de página ficam fora.
 
 ## 13. Security gates
