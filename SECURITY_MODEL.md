@@ -99,7 +99,7 @@ PermissionRequest {
 }
 ```
 
-Default deny para capacidades sensíveis. Grants são por origin/profile/context e podem ser one-shot/session/persistent com expiração. A UI mostra o origin efetivo; não confia em title/texto de página. Reset/clear data revoga grants relacionados. Permission policy do engine é observada e resolvida pelo core, nunca por evento frontend não autenticado.
+Default deny para capacidades sensíveis. PR-042 mantém grants por `requesting_origin/top_level_site/opener_origin/profile_id/tab_id/permission`, exige user gesture para criar grants e suporta one-shot/session/persistent com expiração, revoke e clear por escopo. A UI mostra o origin efetivo; não confia em title/texto de página. Reset/clear data revoga grants relacionados. Permission policy do engine é observada e resolvida pelo core, nunca por evento frontend não autenticado.
 
 ## 9. Downloads
 

@@ -7,6 +7,7 @@ pub mod bookmarks;
 pub mod download_ui;
 pub mod history;
 pub mod ids;
+pub mod permissions;
 pub mod profile;
 pub mod session;
 pub mod tab;
