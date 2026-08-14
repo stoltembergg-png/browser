@@ -11,6 +11,7 @@ pub mod engine_host;
 pub mod ipc_bridge;
 pub mod lifecycle;
 pub mod navigation;
+pub mod popup_policy;
 pub mod tab_manager;
 pub mod tab_ui;
 pub mod vertical_slice;
