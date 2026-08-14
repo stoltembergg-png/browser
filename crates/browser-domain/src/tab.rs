@@ -154,6 +154,10 @@ impl Tab {
         self.current_url.as_ref()
     }
 
+    pub fn pending_url(&self) -> Option<&Url> {
+        self.pending_url.as_ref()
+    }
+
     pub fn active_navigation(&self) -> Option<&NavigationId> {
         self.active_navigation.as_ref()
     }

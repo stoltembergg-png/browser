@@ -37,6 +37,11 @@ pub enum IpcError {
     Unauthorized { command_type: String },
     /// App-level command incorrectly scoped to a tab.
     Misscoped { command_type: String },
+    /// A scoped command's target does not match its envelope tab.
+    TargetMismatch {
+        scoped_tab_id: String,
+        target_tab_id: String,
+    },
 }
 
 impl std::fmt::Display for IpcError {
@@ -59,6 +64,13 @@ impl std::fmt::Display for IpcError {
             IpcError::Misscoped { command_type } => {
                 write!(f, "misscoped: {command_type}")
             }
+            IpcError::TargetMismatch {
+                scoped_tab_id,
+                target_tab_id,
+            } => write!(
+                f,
+                "target tab {target_tab_id} does not match scoped tab {scoped_tab_id}"
+            ),
         }
     }
 }
@@ -132,6 +144,14 @@ impl IpcBridge {
 
         // Tab scoping check
         if let Some(ref tab_id) = envelope.tab_id {
+            if let Some(target_tab_id) = target_tab_id(&envelope.command) {
+                if target_tab_id != tab_id {
+                    return Err(IpcError::TargetMismatch {
+                        scoped_tab_id: tab_id.0.clone(),
+                        target_tab_id: target_tab_id.0.clone(),
+                    });
+                }
+            }
             // Tab must exist
             if !self.known_tabs.contains(&tab_id.0) {
                 return Err(IpcError::WrongTab {
@@ -194,6 +214,15 @@ fn is_app_level_command(command: &UiCommand) -> bool {
     matches!(command, UiCommand::NewTab)
 }
 
+fn target_tab_id(command: &UiCommand) -> Option<&browser_domain::ids::TabId> {
+    match command {
+        UiCommand::CloseTab { target_tab_id } | UiCommand::SelectTab { target_tab_id } => {
+            Some(target_tab_id)
+        }
+        _ => None,
+    }
+}
+
 /// Returns the string name of a command for diagnostics.
 fn command_type_name(command: &UiCommand) -> &'static str {
     match command {
@@ -202,7 +231,7 @@ fn command_type_name(command: &UiCommand) -> &'static str {
         UiCommand::GoBack => "go_back",
         UiCommand::GoForward => "go_forward",
         UiCommand::Stop => "stop",
-        UiCommand::CloseTab => "close_tab",
+        UiCommand::CloseTab { .. } => "close_tab",
         UiCommand::NewTab => "new_tab",
         UiCommand::SelectTab { .. } => "select_tab",
     }
