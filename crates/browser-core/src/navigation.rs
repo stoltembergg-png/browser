@@ -7,6 +7,7 @@
 //! This module is pure logic: no network, no Servo, no I/O. The engine host
 //! calls these methods in response to engine events and UI commands.
 
+use crate::navigation_policy::NavigationPolicy;
 use std::collections::VecDeque;
 
 /// Navigation intent from the UI or engine.
@@ -66,6 +67,9 @@ pub struct NavigationStateMachine {
 
     /// Current position in history (cursor). `None` means no history yet.
     cursor: Option<usize>,
+
+    /// Optional navigation policy re-evaluating redirects.
+    policy: Option<NavigationPolicy>,
 }
 
 impl NavigationStateMachine {
@@ -76,6 +80,18 @@ impl NavigationStateMachine {
             pending_url: None,
             history: VecDeque::new(),
             cursor: None,
+            policy: None,
+        }
+    }
+
+    pub fn new_with_policy(policy: NavigationPolicy) -> Self {
+        Self {
+            current_generation: 0,
+            status: NavigationStatus::Finished,
+            pending_url: None,
+            history: VecDeque::new(),
+            cursor: None,
+            policy: Some(policy),
         }
     }
 
@@ -194,12 +210,21 @@ impl NavigationStateMachine {
     }
 
     /// Handle a redirect: the navigation committed but to a different URL.
+    ///
+    /// When a policy is configured, the redirect target is re-evaluated:
+    /// scheme changes into disallowed schemes or https downgrades are
+    /// refused without changing state.
     pub fn redirect(&mut self, new_url: String, generation: u32) -> bool {
         if generation != self.current_generation {
             return false;
         }
         if self.status != NavigationStatus::Pending && self.status != NavigationStatus::Committed {
             return false;
+        }
+        if let (Some(policy), Some(current_url)) = (&self.policy, self.pending_url()) {
+            if policy.evaluate_redirect(current_url, &new_url).is_err() {
+                return false;
+            }
         }
         self.status = NavigationStatus::Redirected;
         // Update pending URL to the redirect target
@@ -383,6 +408,32 @@ mod tests {
         let gen1 = nav.navigate("https://old.com".to_string());
         let _gen2 = nav.navigate("https://other.com".to_string());
         assert!(!nav.redirect("https://new.com".to_string(), gen1));
+    }
+
+    #[test]
+    fn redirect_with_policy_rejects_downgrade_without_state_change() {
+        let mut nav = NavigationStateMachine::new_with_policy(NavigationPolicy::default());
+        let gen = nav.navigate("https://old.com".to_string());
+        assert!(!nav.redirect("http://new.com".to_string(), gen));
+        assert_eq!(nav.status(), NavigationStatus::Pending);
+        assert_eq!(nav.pending_url(), Some("https://old.com"));
+    }
+
+    #[test]
+    fn redirect_with_policy_rejects_disallowed_scheme() {
+        let mut nav = NavigationStateMachine::new_with_policy(NavigationPolicy::default());
+        let gen = nav.navigate("https://old.com".to_string());
+        assert!(!nav.redirect("javascript:alert(1)".to_string(), gen));
+        assert_eq!(nav.status(), NavigationStatus::Pending);
+    }
+
+    #[test]
+    fn redirect_with_policy_allows_safe_target() {
+        let mut nav = NavigationStateMachine::new_with_policy(NavigationPolicy::default());
+        let gen = nav.navigate("https://old.com".to_string());
+        assert!(nav.redirect("https://new.com".to_string(), gen));
+        assert_eq!(nav.status(), NavigationStatus::Redirected);
+        assert_eq!(nav.pending_url(), Some("https://new.com"));
     }
 
     // --- History cursor ---
