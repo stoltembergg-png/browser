@@ -31,7 +31,7 @@
     "repository",
     "event",
     "base_sha",
-    "head_sha",
+
     "tree_sha",
     "run_id",
     "attempt",
