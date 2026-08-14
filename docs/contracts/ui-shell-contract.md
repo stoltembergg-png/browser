@@ -91,7 +91,8 @@ The coordinator keeps closed tab records as manager tombstones, unregisters them
 
 - There is **no** generic `invoke` bridge. Every command is a named, typed variant.
 - The frontend does not access filesystem, process, or network directly.
-- CSP is `default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'`.
+- CSP é `default-src 'self'`, com scripts/styles em assets externos e sem `unsafe-inline`/`unsafe-eval`;
+- capability `main-window` é escopada à janela `main` e começa com `permissions: []`;
 - Unknown or malformed commands/events produce `CommandRejected` — the UI does not crash.
 
 ## Frontier mock behavior
