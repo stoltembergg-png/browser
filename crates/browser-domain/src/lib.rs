@@ -10,6 +10,7 @@ pub mod ids;
 pub mod permissions;
 pub mod privacy;
 pub mod profile;
+pub mod prompts;
 pub mod session;
 pub mod tab;
 pub mod ui;
