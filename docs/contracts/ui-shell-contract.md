@@ -1,6 +1,6 @@
 # UI Shell Contract — PR-012
 
-> Status: implemented M1 shell mock. This contract defines the typed command/event schema between the privileged Tauri frontend and the browser core. It does not implement browser state or engine behavior.
+> Status: implemented M1 shell mock, extended by PR-032 tab-strip presentation. This contract defines the typed command/event schema and accessibility boundary between the privileged Tauri frontend and the browser core. It does not implement browser state or engine behavior.
 
 ## Objective
 
@@ -75,6 +75,11 @@ Every event is wrapped in an `EventEnvelope`:
 - Wrong schema version → rejected
 - Oversized title → rejected
 
+## Tab strip presentation — PR-032
+
+The shell renders tab records as `button[role="tab"]` controls inside the `tablist`, with a separate labeled close button for each record. The selected tab has `aria-selected="true"` and `tabindex="0"`; inactive tabs use roving `tabindex="-1"`. Arrow keys, Home and End move focus and send the typed `select_tab` command. The selected tab labels the shared `tabpanel` through `aria-labelledby` and `aria-controls="tab-panel"`.
+
+Unknown/stale tab IDs are ignored without creating UI state. Closing the active tab selects an existing fallback record, or clears the panel label and omnibox when no record remains. This is a presentation contract only; browser-core remains the source of truth for tab lifecycle and selection.
 ## Security constraints
 
 - There is **no** generic `invoke` bridge. Every command is a named, typed variant.

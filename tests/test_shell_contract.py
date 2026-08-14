@@ -61,9 +61,42 @@ class ShellContractTests(unittest.TestCase):
         self.assertIn('role="tablist"', self.html)
         self.assertIn('aria-label="Browser tabs"', self.html)
 
+    def test_tab_strip_has_accessible_panel_contract(self) -> None:
+        """Each tab must identify the panel it controls and the panel must be labelled."""
+        self.assertIn('id="tab-panel"', self.html)
+        self.assertIn('role="tabpanel"', self.html)
+        self.assertIn('setAttribute("aria-controls", "tab-panel")', self.html)
+        self.assertIn('content.setAttribute("aria-labelledby", "tab-"', self.html)
+
+    def test_tab_strip_uses_keyboard_navigation(self) -> None:
+        """The tab strip must provide roving focus and arrow/Home/End handling."""
+        self.assertIn('tabindex="0"', self.html)
+        self.assertIn('tabindex', self.html)
+        self.assertIn('event.key === "ArrowRight"', self.html)
+        self.assertIn('event.key === "ArrowLeft"', self.html)
+        self.assertIn('event.key === "Home"', self.html)
+        self.assertIn('event.key === "End"', self.html)
+        self.assertIn('.focus()', self.html)
+
+    def test_tab_selection_uses_typed_command(self) -> None:
+        """Selecting a tab must send the typed select_tab command, not only mutate DOM."""
+        self.assertIn('{ type: "select_tab", target_tab_id: id }', self.html)
+        self.assertIn('cmd.type === "select_tab"', self.html)
+
+    def test_stale_tab_events_are_ignored(self) -> None:
+        """Events for unknown tabs must not create or select stale UI state."""
+        self.assertIn('const eventTabId = event.tab_id || envelope.tab_id;', self.html)
+        self.assertIn('!tabs.has(eventTabId)', self.html)
+
+    def test_tab_close_affordance_is_explicit(self) -> None:
+        """Tab close controls must be separate labeled buttons, not text-only decoration."""
+        self.assertIn('className = "tab-close"', self.html)
+        self.assertIn('aria-label", "Close tab "', self.html)
+        self.assertIn('min-width: 1.75rem', self.html)
+        self.assertNotIn('closeBtn.appendChild(el)', self.html)
+
     def test_navigation_buttons_have_labels(self) -> None:
         """Each navigation button must have an accessible aria-label."""
-        buttons = re.findall(r"<button[^>]*(.*?)</button>", self.html, re.S)
         labels = re.findall(r'aria-label="([^"]+)"', self.html)
         self.assertIn("Go back", labels)
         self.assertIn("Go forward", labels)

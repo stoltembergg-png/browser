@@ -53,36 +53,73 @@
         border-bottom: 1px solid #dbe1ea;
         overflow-x: auto;
       }
+      .tab-bar:focus-visible {
+        outline: 2px solid #315efb;
+        outline-offset: -2px;
+      }
+      .tab-item {
+        display: flex;
+        align-items: center;
+        gap: 0.15rem;
+        min-width: 8rem;
+        max-width: 16rem;
+        padding: 0.15rem 0.25rem 0 0.35rem;
+        border: 1px solid #dbe1ea;
+        border-bottom: 0;
+        border-radius: 0.4rem 0.4rem 0 0;
+        background: #fff;
+      }
       .tab {
         display: flex;
         align-items: center;
+        min-width: 0;
+        flex: 1;
         gap: 0.4rem;
-        padding: 0.3rem 0.6rem;
-        border-radius: 0.4rem 0.4rem 0 0;
-        background: #fff;
-        border: 1px solid #dbe1ea;
+        padding: 0.3rem 0.25rem;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
         cursor: pointer;
         white-space: nowrap;
       }
-      .tab.active {
+      .tab-item.active {
         background: #f5f7fb;
         font-weight: 600;
       }
+      .tab:focus-visible,
+      .tab-close:focus-visible {
+        outline: 2px solid #315efb;
+        outline-offset: 1px;
+      }
+      .tab-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .tab-close {
+        flex: 0 0 auto;
         border: none;
         background: none;
         color: #647086;
         cursor: pointer;
         font-size: 0.85rem;
-        padding: 0 0.2rem;
+        padding: 0.2rem;
+        min-width: 1.75rem;
+        min-height: 1.75rem;
       }
       .tab-close:hover {
         color: #1d2433;
+        background: #e7ebf2;
+        border-radius: 0.25rem;
       }
       .content {
         flex: 1;
         padding: 2rem;
         text-align: center;
+      }
+      .content:focus-visible {
+        outline: 2px solid #315efb;
+        outline-offset: -4px;
       }
       .placeholder {
         color: #647086;
@@ -135,7 +172,13 @@
     </div>
 
     <!-- Main content area -->
-    <main class="content" id="content">
+    <main
+      class="content"
+      id="tab-panel"
+      role="tabpanel"
+      tabindex="0"
+      aria-live="polite"
+    >
       <div class="placeholder">
         <h1>Browser shell</h1>
         <p>
@@ -171,7 +214,7 @@
       const omnibox = document.getElementById("omnibox");
       const tabBar = document.getElementById("tab-bar");
       const status = document.getElementById("status");
-      const content = document.getElementById("content");
+      const content = document.getElementById("tab-panel");
 
       // --- Command sending (mock — no generic invoke) ---
 
@@ -209,6 +252,12 @@
             tab_id: null,
             event: { type: "tab_created", tab_id: id },
           });
+        } else if (cmd.type === "select_tab") {
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: cmd.target_tab_id,
+            event: { type: "tab_selected", tab_id: cmd.target_tab_id },
+          });
         } else if (cmd.type === "close_tab") {
           renderEvent({
             version: UI_CONTRACT_VERSION,
@@ -222,6 +271,12 @@
 
       function renderEvent(envelope) {
         const event = envelope.event;
+        const eventTabId = event.tab_id || envelope.tab_id;
+        if (event.type !== "tab_created" &&
+            (!eventTabId || !tabs.has(eventTabId))) {
+          status.textContent = "Ignored stale tab event";
+          return;
+        }
         switch (event.type) {
           case "tab_created": {
             tabs.set(event.tab_id, {
@@ -229,7 +284,9 @@
               title: "New Tab",
               url: "",
             });
-            selectTab(event.tab_id);
+            activeTabId = event.tab_id;
+            content.setAttribute("aria-labelledby", "tab-" + event.tab_id);
+            renderTabs();
             break;
           }
           case "tab_closed": {
@@ -237,11 +294,26 @@
             if (activeTabId === event.tab_id) {
               const remaining = Array.from(tabs.keys());
               activeTabId = remaining.length > 0 ? remaining[0] : null;
+              if (activeTabId) {
+                const fallbackTab = tabs.get(activeTabId);
+                omnibox.value = fallbackTab.url || "";
+                content.setAttribute("aria-labelledby", "tab-" + activeTabId);
+              } else {
+                content.removeAttribute("aria-labelledby");
+                omnibox.value = "";
+              }
             }
             break;
           }
           case "tab_selected": {
+            if (!tabs.has(event.tab_id)) {
+              status.textContent = "Ignored stale tab event";
+              return;
+            }
             activeTabId = event.tab_id;
+            const selectedTab = tabs.get(event.tab_id);
+            omnibox.value = selectedTab.url || "";
+            content.setAttribute("aria-labelledby", "tab-" + event.tab_id);
             break;
           }
           case "navigation_started": {
@@ -276,40 +348,69 @@
 
       function renderTabs() {
         tabBar.innerHTML = "";
+        const tabIds = Array.from(tabs.keys());
         tabs.forEach((tab) => {
-          const el = document.createElement("div");
-          el.className = "tab" + (tab.id === activeTabId ? " active" : "");
+          const tabId = "tab-" + tab.id;
+          const item = document.createElement("div");
+          item.className = "tab-item" + (tab.id === activeTabId ? " active" : "");
+          const el = document.createElement("button");
+          el.id = tabId;
+          el.className = "tab";
+          el.type = "button";
           el.setAttribute("role", "tab");
-          el.setAttribute("aria-selected", tab.id === activeTabId);
-          el.setAttribute("tabindex", "0");
-          el.textContent = tab.title;
+          el.setAttribute("aria-selected", String(tab.id === activeTabId));
+          el.setAttribute("aria-controls", "tab-panel");
+          el.setAttribute("aria-label", tab.title);
+          el.setAttribute("tabindex", tab.id === activeTabId || tabIds.length === 1 ? "0" : "-1");
+
+          const label = document.createElement("span");
+          label.className = "tab-label";
+          label.textContent = tab.title;
+          el.appendChild(label);
 
           const closeBtn = document.createElement("button");
           closeBtn.className = "tab-close";
           closeBtn.setAttribute("type", "button");
           closeBtn.setAttribute("aria-label", "Close tab " + tab.title);
           closeBtn.textContent = "✕";
-          closeBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
+          closeBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
             sendCommand(
               { type: "close_tab", target_tab_id: tab.id },
               tab.id,
             );
           });
-          el.appendChild(closeBtn);
-
           el.addEventListener("click", () => selectTab(tab.id));
-          tabBar.appendChild(el);
+          el.addEventListener("keydown", (event) => {
+            const currentIndex = tabIds.indexOf(tab.id);
+            let nextIndex = currentIndex;
+            if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % tabIds.length;
+            if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + tabIds.length) % tabIds.length;
+            if (event.key === "Home") nextIndex = 0;
+            if (event.key === "End") nextIndex = tabIds.length - 1;
+            if (nextIndex !== currentIndex) {
+              event.preventDefault();
+              const nextTabId = tabIds[nextIndex];
+              selectTab(nextTabId);
+              document.getElementById("tab-" + nextTabId)?.focus();
+            }
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              selectTab(tab.id);
+            }
+          });
+          item.appendChild(el);
+          item.appendChild(closeBtn);
+          tabBar.appendChild(item);
         });
       }
 
       function selectTab(id) {
-        activeTabId = id;
-        const tab = tabs.get(id);
-        if (tab) {
-          omnibox.value = tab.url || "";
+        if (!tabs.has(id)) {
+          status.textContent = "Ignored stale tab selection";
+          return;
         }
-        renderTabs();
+        sendCommand({ type: "select_tab", target_tab_id: id }, id);
       }
 
       // --- Event listeners ---
