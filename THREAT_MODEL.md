@@ -31,25 +31,6 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 | TM-017 | storage migration | malformed/corrupt profile | data loss/startup failure | versioned session schema, transactional journal, last-valid-snapshot recovery; full profile migration remains separate | torn/failed session commit, restore validation; old-version migration remains a downstream gate | control implemented for PR-036; full migration pending |
 | TM-018 | external protocol | handler abuse | shell command execution/phishing | PR-044: explicit handler allowlist, alphanumeric handler names, shell-metachar rejection for handler and args, confirmation required unless explicitly disabled | `navigation_policy` protocol corpus and shell-injection tests | control implemented for PR-044; OS handler launching adapter pending |
 
-## Regression gate (PR-048)
-
-The machine-readable inventory at `docs/security/threat-regression-manifest.json` is the
-release-gate source for TM-001 through TM-018. Every scenario must declare a control,
-a test reference, an evidence note and an explicit `release_blocker` value. A status of
-`partial`, `planned`, `deferred` or `blocked` is never silently treated as green.
-
-Run the inventory check on the current checkout with:
-
-```text
-python3 scripts/threat_regression_gate.py --validate-only
-```
-
-The release evaluator is fail-closed. `--channel alpha` and `--channel stable` return
-`NO_GO` and a non-zero exit code while any scenario lacks complete evidence. The current
-manifest deliberately reports `NO_GO`: the suite records available engine-neutral negative
-controls but does not substitute fake-engine tests for Servo, process-isolation, TLS or
-OS-specific artifacts.
-
 ## Abuse-case acceptance tests
 
 1. Uma página fixture tenta `invoke`/command no frontend: não existe bridge de página e nenhum comando é executado.
