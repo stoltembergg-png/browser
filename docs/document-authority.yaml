@@ -52,6 +52,7 @@ present:
   - .github/pull_request_template.md
   - docs/development/GITHUB_LABELS.md
   - docs/security/GITHUB_ACTIONS_SECURITY.md
+  - docs/security/threat-regression-manifest.json
   - docs/contracts/workspace-contract.md
 
 planned:

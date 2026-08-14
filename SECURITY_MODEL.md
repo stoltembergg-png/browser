@@ -151,7 +151,7 @@ Diagnostics bundle deve permitir investigação sem profile completo: versões, 
 - M1: Tauri capability/CSP review + engine boundary;
 - M2: malformed IPC, navigation policy e crash tests;
 - M3: profile/download/session threat cases;
-- M4: threat model review e negative suite obrigatória;
+- M4: threat model review and negative suite obrigatória; `docs/security/threat-regression-manifest.json` must enumerate TM-001…TM-018, and the Alpha/Stable evaluator is fail-closed;
 - M5: WPT/security compatibility e fuzz/soak;
 - M6: signed artifact, SBOM, provenance, updater compromise/recovery drill;
 - Stable: engine host separado, launch restrictions e evidence adversarial por OS são obrigatórios; sem isso permanece Beta/experimental e nenhum claim de isolation é permitido.

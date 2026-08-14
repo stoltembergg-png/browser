@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "source_of_truth": "THREAT_MODEL.md",
+  "purpose": "Machine-readable inventory for negative security controls; absence of evidence remains a release blocker.",
+  "scenarios": [
+    {
+      "id": "TM-001",
+      "status": "partial",
+      "control": "Crash recovery is covered, but renderer/process isolation is not proven.",
+      "test": {"available": true, "path": "crates/browser-core/src/crash_recovery.rs", "selector": "crash_recovery::tests"},
+      "evidence": "In-process engine and missing adversarial process artifact block Stable.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-002",
+      "status": "partial",
+      "control": "Versioned IPC, bounded payloads and caller-context fencing reject malformed or mis-scoped commands.",
+      "test": {"available": true, "path": "crates/browser-core/src/ipc_bridge.rs", "selector": "caller-context and malformed-payload tests"},
+      "evidence": "Real Tauri command-adapter evidence is still pending.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-003",
+      "status": "partial",
+      "control": "Request IDs, navigation generations and engine epochs fence stale events.",
+      "test": {"available": true, "path": "crates/browser-core/src/crash_recovery.rs", "selector": "stale epoch and generation tests"},
+      "evidence": "Contract tests exist; a real Servo event-stream artifact is still pending.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-004",
+      "status": "partial",
+      "control": "Navigation policy validates schemes, hosts, ports, redirects, rooted file paths and external handlers.",
+      "test": {"available": true, "path": "crates/browser-core/tests/navigation_policy.rs", "selector": "navigation policy URL, redirect, traversal and handler corpus"},
+      "evidence": "Engine-neutral control is tested; real Servo navigation integration remains a separate gate.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-005",
+      "status": "partial",
+      "control": "Download broker enforces profile roots, filename/path safety, quotas, quarantine and interruption cleanup.",
+      "test": {"available": true, "path": "crates/browser-core/tests/download_broker.rs", "selector": "traversal, ADS, device-name, collision, quota and interruption tests"},
+      "evidence": "OS-specific executable marking and checksum evidence remain pending.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-006",
+      "status": "partial",
+      "control": "Permission and prompt coordinators enforce exact origin/context/profile/tab scope, gesture and lifetime rules.",
+      "test": {"available": true, "path": "crates/browser-domain/tests/permission_policy.rs", "selector": "origin-confusion, gesture, expiry, revoke and clear tests"},
+      "evidence": "Hardware/engine permission adapter evidence is not present.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-007",
+      "status": "implemented",
+      "control": "Popup policy denies unsafe opener/cross-origin cases and bounds popup storms.",
+      "test": {"available": true, "path": "crates/browser-core/src/popup_policy.rs", "selector": "popup_policy::tests"},
+      "evidence": "Core negative suite covers gesture, origin, routing and storm limits.",
+      "release_blocker": false
+    },
+    {
+      "id": "TM-008",
+      "status": "blocked",
+      "control": "TLS, certificate and mixed-content policy must be delegated to the trusted engine/platform.",
+      "test": {"available": false, "path": null, "selector": null},
+      "evidence": "No local TLS fixture or real Servo network artifact is available; do not claim coverage.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-009",
+      "status": "partial",
+      "control": "Tauri origin, capability, CSP and caller-context controls constrain the privileged UI boundary.",
+      "test": {"available": true, "path": "tests/test_shell_contract.py", "selector": "origin, window, iframe and generation negative cases"},
+      "evidence": "Local shell controls are tested; page/process isolation remains unproven.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-010",
+      "status": "blocked",
+      "control": "Profile lock and OS permission/keychain policy must prevent local profile theft and lock bypass.",
+      "test": {"available": false, "path": null, "selector": null},
+      "evidence": "No concurrent-process, keychain or backup artifact is available in this slice.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-011",
+      "status": "planned",
+      "control": "Signed update metadata, channel/downgrade checks, revocation and last-known-good recovery are required.",
+      "test": {"available": false, "path": null, "selector": null},
+      "evidence": "Updater implementation is outside the completed M4 slice.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-012",
+      "status": "planned",
+      "control": "Fork workflows must be secretless, least-privilege and resistant to hostile reporter/artifact input.",
+      "test": {"available": false, "path": null, "selector": null},
+      "evidence": "Workflow-hostile PR fixtures and enforcement identity are not yet proven.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-013",
+      "status": "partial",
+      "control": "Lockfile, dependency policy and baseline secret checks reduce supply-chain exposure.",
+      "test": {"available": true, "path": "tests/test_security_check.py", "selector": "git-source and secret-like text rejection tests"},
+      "evidence": "Advisory, license, SBOM and provenance gates are not complete.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-014",
+      "status": "deferred",
+      "control": "Extensions remain outside the MVP until a capability/process boundary and manifest policy exist.",
+      "test": {"available": false, "path": null, "selector": null},
+      "evidence": "No extension API is claimed or enabled.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-015",
+      "status": "partial",
+      "control": "Diagnostics use an allowlist and redact URLs, tokens, paths and page content before local retention.",
+      "test": {"available": true, "path": "crates/browser-domain/src/diagnostics.rs", "selector": "diagnostics redaction tests"},
+      "evidence": "Local bundle controls are tested; telemetry integration is not present.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-016",
+      "status": "partial",
+      "control": "Watchdog, bounded restart, checkpoint retention and epoch fencing prevent unsafe recovery replay.",
+      "test": {"available": true, "path": "crates/browser-core/src/crash_recovery.rs", "selector": "crash, hang, restart, shutdown and stale-event tests"},
+      "evidence": "Real engine crash/hang artifacts are still pending.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-017",
+      "status": "partial",
+      "control": "Versioned session data and transactional journal preserve the last valid snapshot across interruption.",
+      "test": {"available": true, "path": "crates/browser-domain/src/profile.rs", "selector": "profile/session journal and migration tests"},
+      "evidence": "Full profile migration matrix remains a downstream gate.",
+      "release_blocker": true
+    },
+    {
+      "id": "TM-018",
+      "status": "partial",
+      "control": "External handlers require an explicit allowlist/confirmation and reject shell metacharacters.",
+      "test": {"available": true, "path": "crates/browser-core/tests/navigation_policy.rs", "selector": "external protocol and shell-injection corpus"},
+      "evidence": "OS handler launching adapter is not present; policy-only evidence is not a launch claim.",
+      "release_blocker": true
+    }
+  ]
+}

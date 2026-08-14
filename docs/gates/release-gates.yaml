@@ -143,6 +143,8 @@ Alpha:
   required:
     - tabs_sessions_profiles_history_bookmarks_downloads_permissions
     - security_regression_suite
+    - threat_regression_manifest_with_18_scenarios
+    - fail_closed_alpha_threat_gate
     - tm_009_privileged_ui_boundary
     - pinned_wpt_subset_and_triage
     - reference_and_secondary_platform_evidence

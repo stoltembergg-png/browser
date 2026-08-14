@@ -65,6 +65,12 @@ jobs:
       - name: Check security baseline
         run: python3 scripts/security_check.py
 
+      - name: Run threat regression gate tests
+        run: python3 tests/test_threat_regression_gate.py
+
+      - name: Validate threat regression manifest
+        run: python3 scripts/threat_regression_gate.py --validate-only
+
       - name: Check architecture graph
         run: cargo run -p xtask --locked -- architecture-check
 
