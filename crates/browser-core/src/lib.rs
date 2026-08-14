@@ -11,6 +11,7 @@ pub mod engine_host;
 pub mod ipc_bridge;
 pub mod lifecycle;
 pub mod navigation;
+pub mod tab_manager;
 pub mod vertical_slice;
 
 pub const PACKAGE_NAME: &str = "browser-core";
