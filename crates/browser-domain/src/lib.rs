@@ -12,6 +12,7 @@ pub mod permissions;
 pub mod privacy;
 pub mod profile;
 pub mod prompts;
+pub mod scheme_security;
 pub mod session;
 pub mod tab;
 pub mod ui;
