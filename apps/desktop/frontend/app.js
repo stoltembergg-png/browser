@@ -12,6 +12,7 @@
       "use strict";
 
       const UI_CONTRACT_VERSION = 1;
+      const MAX_HISTORY_ENTRIES = 50;
       let requestCounter = 0;
       let tabCounter = 0;
       let activeTabId = null;
@@ -51,6 +52,9 @@
         if (tab.history[tab.historyIndex] === url) return;
         tab.history = tab.history.slice(0, tab.historyIndex + 1);
         tab.history.push(url);
+        if (tab.history.length > MAX_HISTORY_ENTRIES) {
+          tab.history.shift();
+        }
         tab.historyIndex = tab.history.length - 1;
         updateHistoryCapabilities(tab);
       }

@@ -127,6 +127,11 @@ class ShellContractTests(unittest.TestCase):
         self.assertIn("tab.historyIndex += 1", self.js)
         self.assertIn("tab.history.push", self.js)
 
+    def test_navigation_history_has_a_memory_bound(self) -> None:
+        """The shell mock must not grow navigation state without a limit."""
+        self.assertIn("MAX_HISTORY_ENTRIES", self.js)
+        self.assertIn("tab.history.shift()", self.js)
+
     def test_no_generic_invoke(self) -> None:
         """The frontend must not use a generic invoke bridge."""
         for source_name, source in (("index.html", self.html), ("app.js", self.js)):
