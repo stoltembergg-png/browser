@@ -3,6 +3,7 @@
 /// Pure browser-domain state and value objects.
 pub const PACKAGE_NAME: &str = "browser-domain";
 
+pub mod bookmarks;
 pub mod history;
 pub mod ids;
 pub mod profile;
