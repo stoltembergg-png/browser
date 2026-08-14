@@ -234,7 +234,7 @@ fn real_servo_software_surface_loads_input_resizes_and_shuts_down() {
     wait_for("resize frame", &adapter, &id, |evidence| {
         evidence.viewport.width == 800
             && evidence.viewport.height == 600
-            && evidence.frame_count >= before_resize
+            && evidence.frame_count > before_resize
     });
 
     let final_evidence = adapter.evidence(&id).expect("final evidence");
@@ -242,6 +242,7 @@ fn real_servo_software_surface_loads_input_resizes_and_shuts_down() {
     assert!(final_evidence.load_complete);
     assert!(final_evidence.screenshot_ready);
     assert!(final_evidence.frame_digest.is_some());
+    assert!(final_evidence.frame_non_blank);
     adapter.destroy(&id).expect("ordered Servo shutdown");
     write_evidence_artifact(&final_evidence);
 }
@@ -273,6 +274,7 @@ fn write_evidence_artifact(evidence: &ServoEvidence) {
         "surface_strategy": evidence.surface_strategy,
         "thread_affinity": "engine-thread-only",
         "frame_digest": evidence.frame_digest.clone(),
+        "frame_non_blank": evidence.frame_non_blank,
         "load_complete": evidence.load_complete,
         "screenshot_ready": evidence.screenshot_ready,
         "frame_count": evidence.frame_count,
@@ -300,6 +302,7 @@ fn write_evidence_artifact(evidence: &ServoEvidence) {
         "thread_affinity": unsigned["thread_affinity"],
         "artifact_digest": hex_digest(digest),
         "frame_digest": unsigned["frame_digest"],
+        "frame_non_blank": unsigned["frame_non_blank"],
         "load_complete": unsigned["load_complete"],
         "screenshot_ready": unsigned["screenshot_ready"],
         "frame_count": unsigned["frame_count"],

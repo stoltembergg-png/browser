@@ -12,7 +12,7 @@
 3. Build `Servo` with a cloned `EventLoopWaker`.
 4. Build a `WebView` with `WebViewDelegate` and optional initial URL.
 5. Pump `Servo::spin_event_loop()` after commands and while the fixture waits.
-6. On `notify_new_frame_ready`, call `prepare_for_rendering`, `WebView::paint`, `read_to_image`/store the SHA-256 `frame_digest`, and then `RenderingContext::present`.
+6. On `notify_new_frame_ready`, call `prepare_for_rendering`, `WebView::paint`, `read_to_image`, require at least one non-zero pixel, store the SHA-256 `frame_digest`, and then `RenderingContext::present`. A resize is accepted only after a subsequent frame (`frame_count` strictly increases).
 7. After `LoadStatus::Complete`, request `WebView::take_screenshot` and require its callback before accepting input.
 8. Drop the `WebView`, then drop the `Servo` handle; Servo's official `Drop` implementation performs the ordered shutdown.
 
@@ -40,7 +40,7 @@ The real contract test uses a local HTTP fixture and must observe:
 - same-thread evidence;
 - ordered shutdown without timeout/deadlock.
 
-When `PR026_ARTIFACT_PATH` is set, the test writes an identity-bound JSON artifact. `scripts/servo_evidence_check.py` rejects missing identity, wrong Servo revision, zero frames, skipped cases, wrong surface strategy, or missing SHA-256 digest. No-run, no-frame, skip, and stale artifacts are `NO_GO`.
+When `PR026_ARTIFACT_PATH` is set, the test writes an identity-bound JSON artifact. The E2E rejects a non-increasing resize frame count; `scripts/servo_evidence_check.py` rejects missing identity, wrong Servo revision, zero frames, skipped cases, wrong surface strategy, blank readback (`frame_non_blank`), or missing SHA-256 digest. No-run, no-frame, blank-frame, skip, and stale artifacts are `NO_GO`.
 
 ## Out of scope
 

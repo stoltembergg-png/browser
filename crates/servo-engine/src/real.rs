@@ -59,6 +59,7 @@ struct ServoDelegate {
     current_url: Arc<Mutex<Option<String>>>,
     title: Arc<Mutex<Option<String>>>,
     frame_digest: Arc<Mutex<Option<String>>>,
+    frame_non_blank: Arc<AtomicBool>,
     load_complete: Arc<AtomicBool>,
     screenshot_ready: Arc<AtomicBool>,
 }
@@ -93,7 +94,10 @@ impl WebViewDelegate for ServoDelegate {
             DeviceIntPoint::new(size.width as i32, size.height as i32),
         );
         if let Some(image) = self.context.read_to_image(rect) {
-            let digest = Sha256::digest(image.as_raw());
+            let pixels = image.as_raw();
+            let digest = Sha256::digest(pixels);
+            self.frame_non_blank
+                .store(pixels.iter().any(|byte| *byte != 0), Ordering::Release);
             *self
                 .frame_digest
                 .lock()
@@ -113,6 +117,7 @@ struct ServoInstance {
     current_url: Arc<Mutex<Option<String>>>,
     title: Arc<Mutex<Option<String>>>,
     frame_digest: Arc<Mutex<Option<String>>>,
+    frame_non_blank: Arc<AtomicBool>,
     load_complete: Arc<AtomicBool>,
     screenshot_ready: Arc<AtomicBool>,
     viewport: Viewport,
@@ -156,6 +161,7 @@ impl ServoInstance {
         let current_url = Arc::new(Mutex::new(None));
         let title = Arc::new(Mutex::new(None));
         let frame_digest = Arc::new(Mutex::new(None));
+        let frame_non_blank = Arc::new(AtomicBool::new(false));
         let load_complete = Arc::new(AtomicBool::new(false));
         let screenshot_ready = Arc::new(AtomicBool::new(false));
         let delegate = Rc::new(ServoDelegate {
@@ -164,6 +170,7 @@ impl ServoInstance {
             current_url: current_url.clone(),
             title: title.clone(),
             frame_digest: frame_digest.clone(),
+            frame_non_blank: frame_non_blank.clone(),
             load_complete: load_complete.clone(),
             screenshot_ready: screenshot_ready.clone(),
         });
@@ -190,6 +197,7 @@ impl ServoInstance {
             current_url,
             title,
             frame_digest,
+            frame_non_blank,
             load_complete,
             screenshot_ready,
             viewport,
@@ -312,6 +320,7 @@ impl ServoInstance {
                 .lock()
                 .expect("frame digest mutex poisoned")
                 .clone(),
+            frame_non_blank: self.frame_non_blank.load(Ordering::Acquire),
             load_complete: self.load_complete.load(Ordering::Acquire),
             screenshot_ready: self.screenshot_ready.load(Ordering::Acquire),
             thread_id: format!("{:?}", self.thread_id),
@@ -487,6 +496,7 @@ pub struct ServoEvidence {
     pub current_url: Option<String>,
     pub title: Option<String>,
     pub frame_digest: Option<String>,
+    pub frame_non_blank: bool,
     pub load_complete: bool,
     pub screenshot_ready: bool,
     pub thread_id: String,

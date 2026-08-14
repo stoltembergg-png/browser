@@ -37,6 +37,7 @@ def validate(artifact: dict) -> list[str]:
         "thread_affinity",
         "artifact_digest",
         "frame_digest",
+        "frame_non_blank",
         "load_complete",
         "screenshot_ready",
         "frame_count",
@@ -67,6 +68,8 @@ def validate(artifact: dict) -> list[str]:
         errors.append("artifact_digest must be a 64-character lowercase SHA-256")
     if not SHA64.fullmatch(artifact["frame_digest"]):
         errors.append("frame_digest must be a 64-character lowercase SHA-256")
+    if artifact["frame_non_blank"] is not True:
+        errors.append("frame_non_blank must be true")
     if artifact["load_complete"] is not True:
         errors.append("load_complete must be true")
     if artifact["screenshot_ready"] is not True:

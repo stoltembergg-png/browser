@@ -22,6 +22,7 @@ def valid_artifact() -> dict:
         "thread_affinity": "engine-thread-only",
         "artifact_digest": "c" * 64,
         "frame_digest": "d" * 64,
+        "frame_non_blank": True,
         "load_complete": True,
         "screenshot_ready": True,
         "frame_count": 3,
@@ -69,6 +70,13 @@ class ServoEvidenceCheckTests(unittest.TestCase):
         result = self.run_check(artifact)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("servo_revision", result.stderr)
+
+    def test_rejects_blank_frame_evidence(self) -> None:
+        artifact = valid_artifact()
+        artifact["frame_non_blank"] = False
+        result = self.run_check(artifact)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("frame_non_blank", result.stderr)
 
 
 if __name__ == "__main__":
