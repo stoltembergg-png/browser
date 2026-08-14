@@ -30,6 +30,7 @@ STRIDE é usado como checklist por boundary, complementado por abuse cases e rel
 | TM-016 | engine hang/crash | denial/data loss | tab loss/app unavailable | watchdog/hang classification, bounded restart attempts, checkpoint retention, epoch/generation fencing, terminal result; no automatic form resubmission | `crash_recovery` crash/hang/restart/abrupt-shutdown tests | control implemented; real engine E2E pending |
 | TM-017 | storage migration | malformed/corrupt profile | data loss/startup failure | versioned session schema, transactional journal, last-valid-snapshot recovery; full profile migration remains separate | torn/failed session commit, restore validation; old-version migration remains a downstream gate | control implemented for PR-036; full migration pending |
 | TM-018 | external protocol | handler abuse | shell command execution/phishing | PR-044: explicit handler allowlist, alphanumeric handler names, shell-metachar rejection for handler and args, confirmation required unless explicitly disabled | `navigation_policy` protocol corpus and shell-injection tests | control implemented for PR-044; OS handler launching adapter pending |
+| TM-019 | extension → browser | extension boundary abuse | privileged API/loader/process compromise | PR-058: `extensions=false` no MVP/Alpha, capability gate fail-closed, manifest id/name/version validation, permission allowlist (storage only), no loader/API/isolated world/process model; ADR-008 go/no-go = NO_GO | `extensions` capability gate, malicious manifest/permission, privilege matrix tests | control implemented for PR-058; gate stays closed until ADR review |
 
 ## Regression gate (PR-048)
 
@@ -37,6 +38,9 @@ The machine-readable inventory at `docs/security/threat-regression-manifest.json
 release-gate source for TM-001 through TM-018. Every scenario must declare a control,
 a test reference, an evidence note and an explicit `release_blocker` value. A status of
 `partial`, `planned`, `deferred` or `blocked` is never silently treated as green.
+TM-019 is tracked in this document only (the manifest is contract-fixed at TM-001..TM-018
+by PR-048); it is non-blocking for release only because extensions are disabled, and it
+becomes release-blocking if the capability gate is ever opened without an ADR review.
 
 Run the inventory check on the current checkout with:
 
