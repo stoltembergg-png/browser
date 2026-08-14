@@ -47,6 +47,22 @@ message instead of mutating another tab.
 - The controls remain typed commands; the frontend does not invoke a generic
   bridge or access engine APIs directly.
 
+## Local shell mock behavior
+
+The local shell mock keeps a bounded history cursor per tab so the contract can
+exercise control transitions before a real Tauri bridge is available:
+
+- a new navigation truncates any forward branch and appends one URL;
+- Back and Forward move the cursor without appending duplicate entries;
+- Reload replays the current URL without changing the cursor;
+- Stop emits `navigation_cancelled` only while a tab is loading;
+- a control with no valid target emits `command_rejected` and leaves the tab
+  state explicit rather than guessing a fallback.
+
+This is test-support behavior, not engine or browser-core authority. Real
+history capabilities and navigation results must still come from the typed
+core/engine path before PR-027 can leave its blocked state.
+
 ## Evidence boundary
 
 The Rust unit/integration tests and shell-contract tests prove the projection,

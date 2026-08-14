@@ -112,6 +112,21 @@ class ShellContractTests(unittest.TestCase):
         self.assertIn("Reload page", labels)
         self.assertIn("New tab", labels)
 
+    def test_navigation_controls_have_typed_result_handlers(self) -> None:
+        """Navigation controls must project every typed action into a result."""
+        for command_type in ("go_back", "go_forward", "reload", "stop"):
+            self.assertIn(f'cmd.type === "{command_type}"', self.js)
+        self.assertIn('event: { type: "navigation_cancelled" }', self.js)
+        self.assertIn('event: { type: "command_rejected"', self.js)
+
+    def test_navigation_history_uses_a_cursor_per_tab(self) -> None:
+        """Back/forward must move a tab cursor instead of duplicating history."""
+        self.assertIn("historyIndex", self.js)
+        self.assertIn("history: []", self.js)
+        self.assertIn("tab.historyIndex -= 1", self.js)
+        self.assertIn("tab.historyIndex += 1", self.js)
+        self.assertIn("tab.history.push", self.js)
+
     def test_no_generic_invoke(self) -> None:
         """The frontend must not use a generic invoke bridge."""
         for source_name, source in (("index.html", self.html), ("app.js", self.js)):
