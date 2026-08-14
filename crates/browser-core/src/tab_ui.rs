@@ -9,6 +9,7 @@ use engine_api::events::{EngineEvent, NavigationGeneration};
 use std::fmt;
 
 use crate::ipc_bridge::{IpcBridge, IpcError};
+use crate::navigation_policy::{NavigationAction, NavigationPolicy};
 use crate::tab_manager::{RoutedEngineEvent, TabManager, TabManagerError};
 
 /// Errors produced while connecting a typed UI command to the tab manager.
@@ -195,6 +196,14 @@ impl TabUiCoordinator {
         url: String,
     ) -> Result<Vec<EventEnvelope>, CoordinatorError> {
         validate_navigate_url(&url).map_err(CoordinatorError::InvalidPayload)?;
+        match NavigationPolicy::default().classify(&url) {
+            NavigationAction::Allow => {}
+            NavigationAction::Deny | NavigationAction::Confirm => {
+                return Err(CoordinatorError::InvalidPayload(
+                    "navigation denied by scheme policy".to_string(),
+                ));
+            }
+        }
         let binding =
             self.manager
                 .binding(tab_id)
@@ -448,6 +457,29 @@ mod tests {
             Some("https://one.example")
         );
         assert_eq!(coordinator.current_url("tab-2"), None);
+    }
+
+    #[test]
+    fn navigate_denies_disallowed_schemes() {
+        let mut coordinator = TabUiCoordinator::new();
+        create_two_tabs(&mut coordinator);
+
+        for url in [
+            "javascript:alert(1)",
+            "data:text/html,x",
+            "file:///etc/passwd",
+        ] {
+            let result = coordinator.handle_command(&raw(
+                UiCommand::Navigate { url: url.into() },
+                Some("tab-1"),
+                format!("request-{url}").as_str(),
+            ));
+            assert!(
+                matches!(result, Err(CoordinatorError::InvalidPayload(_))),
+                "expected denial for {url:?}"
+            );
+        }
+        assert_eq!(coordinator.current_url("tab-1"), None);
     }
 
     #[test]

@@ -14,6 +14,7 @@ pub mod engine_host;
 pub mod ipc_bridge;
 pub mod lifecycle;
 pub mod navigation;
+pub mod navigation_policy;
 pub mod popup_policy;
 pub mod session_lifecycle;
 pub mod tab_manager;
