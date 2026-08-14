@@ -19,6 +19,8 @@ WORKSPACE = Path(__file__).parents[1]
 FRONTEND = WORKSPACE / "apps" / "desktop" / "frontend" / "index.html"
 FRONTEND_JS = WORKSPACE / "apps" / "desktop" / "frontend" / "app.js"
 FRONTEND_CSS = WORKSPACE / "apps" / "desktop" / "frontend" / "styles.css"
+TAURI_CONFIG = WORKSPACE / "apps" / "desktop" / "src-tauri" / "tauri.conf.json"
+TAURI_CAPABILITY = WORKSPACE / "apps" / "desktop" / "src-tauri" / "capabilities" / "main.json"
 
 # Known typed command types matching browser_domain::ui::UiCommand
 KNOWN_COMMAND_TYPES = {
@@ -122,6 +124,42 @@ class ShellContractTests(unittest.TestCase):
                 source,
                 f"{source_name} uses a generic .invoke() call",
             )
+
+    def test_tauri_csp_is_local_only_and_has_no_inline_execution(self) -> None:
+        config = json.loads(TAURI_CONFIG.read_text(encoding="utf-8"))
+        csp = config["app"]["security"]["csp"]
+        for required in (
+            "default-src 'self'",
+            "script-src 'self'",
+            "style-src 'self'",
+            "connect-src 'none'",
+            "object-src 'none'",
+            "base-uri 'none'",
+            "frame-ancestors 'none'",
+            "form-action 'none'",
+        ):
+            self.assertIn(required, csp)
+        self.assertNotIn("unsafe-inline", csp)
+        self.assertNotIn("unsafe-eval", csp)
+        self.assertNotIn("http://", csp)
+        self.assertNotIn("https://", csp)
+        self.assertNotIn("<style>", self.html)
+        self.assertNotIn("<script>", self.html)
+
+    def test_tauri_capability_is_window_scoped_and_denies_plugins(self) -> None:
+        capability = json.loads(TAURI_CAPABILITY.read_text(encoding="utf-8"))
+        self.assertEqual(capability["identifier"], "main-window")
+        self.assertEqual(capability["windows"], ["main"])
+        self.assertEqual(capability["permissions"], [])
+        serialized = json.dumps(capability)
+        for denied_prefix in ("fs:", "http:", "process:", "shell:", "sql:"):
+            self.assertNotIn(denied_prefix, serialized)
+
+    def test_tauri_remote_navigation_is_not_configured(self) -> None:
+        config = json.loads(TAURI_CONFIG.read_text(encoding="utf-8"))
+        self.assertNotIn("devUrl", config.get("build", {}))
+        self.assertNotIn("url", config["app"]["windows"][0])
+        self.assertNotIn("<iframe", self.html)
 
     def test_status_region_is_accessible(self) -> None:
         """An aria-live status region must exist for screen reader announcements."""
