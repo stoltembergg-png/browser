@@ -15,7 +15,7 @@
       let requestCounter = 0;
       let tabCounter = 0;
       let activeTabId = null;
-      const tabs = new Map(); // tabId -> {id, title, url}
+      const tabs = new Map(); // tabId -> {id, title, url, loading, error, history}
 
       const omnibox = document.getElementById("omnibox");
       const tabBar = document.getElementById("tab-bar");
@@ -89,6 +89,10 @@
               id: event.tab_id,
               title: "New Tab",
               url: "",
+              loading: false,
+              error: null,
+              canGoBack: false,
+              canGoForward: false,
             });
             activeTabId = event.tab_id;
             content.setAttribute("aria-labelledby", "tab-" + event.tab_id);
@@ -123,14 +127,56 @@
             break;
           }
           case "navigation_started": {
-            const tab = tabs.get(envelope.tab_id);
+            const tab = tabs.get(envelope.tab_id || activeTabId);
             if (tab) {
               tab.url = event.url;
+              tab.loading = true;
+              tab.error = null;
+              if (typeof event.can_go_back === "boolean") tab.canGoBack = event.can_go_back;
+              if (typeof event.can_go_forward === "boolean") tab.canGoForward = event.can_go_forward;
               if (activeTabId === tab.id) {
                 omnibox.value = event.url;
               }
             }
             status.textContent = "Loading " + event.url;
+            break;
+          }
+          case "navigation_committed": {
+            const tab = tabs.get(envelope.tab_id || activeTabId);
+            if (tab) {
+              tab.url = event.url;
+              tab.error = null;
+              if (activeTabId === tab.id) omnibox.value = event.url;
+            }
+            break;
+          }
+          case "navigation_finished": {
+            const tab = tabs.get(envelope.tab_id || activeTabId);
+            if (tab) {
+              tab.url = event.url;
+              tab.loading = false;
+              tab.error = null;
+              if (activeTabId === tab.id) omnibox.value = event.url;
+            }
+            status.textContent = "Ready";
+            break;
+          }
+          case "navigation_failed": {
+            const tab = tabs.get(envelope.tab_id || activeTabId);
+            if (tab) {
+              tab.loading = false;
+              tab.error = event.reason;
+            }
+            status.textContent = "Error: " + event.reason;
+            break;
+          }
+          case "navigation_cancelled": {
+            const tab = tabs.get(envelope.tab_id || activeTabId);
+            if (tab) {
+              tab.loading = false;
+              tab.error = null;
+            }
+            status.textContent = "Navigation stopped";
             break;
           }
           case "title_changed": {
@@ -139,6 +185,11 @@
             break;
           }
           case "command_rejected": {
+            const tab = tabs.get(envelope.tab_id || activeTabId);
+            if (tab) {
+              tab.loading = false;
+              tab.error = event.reason;
+            }
             status.textContent = "Error: " + event.reason;
             break;
           }
@@ -148,6 +199,18 @@
             break;
         }
         renderTabs();
+      }
+
+      function updateNavigationControls() {
+        const tab = activeTabId ? tabs.get(activeTabId) : null;
+        const back = document.getElementById("btn-back");
+        const forward = document.getElementById("btn-forward");
+        const reload = document.getElementById("btn-reload");
+        const stop = document.getElementById("btn-stop");
+        back.disabled = !tab || !tab.canGoBack;
+        forward.disabled = !tab || !tab.canGoForward;
+        reload.disabled = !tab || !tab.url || tab.loading;
+        stop.disabled = !tab || !tab.loading;
       }
 
       // --- DOM rendering ---
@@ -209,6 +272,7 @@
           item.appendChild(closeBtn);
           tabBar.appendChild(item);
         });
+        updateNavigationControls();
       }
 
       function selectTab(id) {

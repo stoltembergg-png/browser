@@ -247,6 +247,7 @@ fn engine_event_to_ui(tab_id: &TabId, engine_event: &EngineEvent) -> Option<Even
         EngineEvent::NavigationFailed { reason, .. } => UiEvent::NavigationFailed {
             reason: reason.clone(),
         },
+        EngineEvent::NavigationCancelled { .. } => UiEvent::NavigationCancelled,
         EngineEvent::TitleChanged { title } => UiEvent::TitleChanged {
             title: title.clone(),
         },

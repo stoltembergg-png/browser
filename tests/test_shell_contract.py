@@ -43,6 +43,7 @@ KNOWN_EVENT_TYPES = {
     "navigation_committed",
     "navigation_finished",
     "navigation_failed",
+    "navigation_cancelled",
     "title_changed",
     "command_rejected",
 }

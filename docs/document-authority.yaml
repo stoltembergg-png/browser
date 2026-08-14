@@ -53,6 +53,7 @@ present:
   - docs/development/GITHUB_LABELS.md
   - docs/security/GITHUB_ACTIONS_SECURITY.md
   - docs/contracts/workspace-contract.md
+  - docs/contracts/navigation-chrome-contract.md
 
 planned:
   - path: DEVELOPMENT.md
