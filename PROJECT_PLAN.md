@@ -100,6 +100,18 @@ O MVP é experimental e tem escopo de plataforma explicitamente limitado. Ele s�
 - nenhum conteúdo arbitrário for carregado no WebView privilegiado do Tauri;
 - nenhum documento chame o MVP de navegador de produção, sandboxed ou site-isolated.
 
+#### Evidência MVP (PR-029)
+
+O harness `test-support::smoke` (`cargo run -p xtask -- smoke`) executa o fluxo MVP
+engine-neutral (perfil limpo, session open/commit transacional, boot do engine host,
+tab create, navigate, render signal, back, forward, reload, stop, shutdown) contra o
+engine fake e grava `docs/contracts/smoke-evidence.json` com evidência bound a
+repository, head/tree SHA, engine revision e OS/arch. Fail-closed: qualquer passo
+falho torna o relatório `NO_GO` e o runner sai com código ≠ 0. Enquanto o engine
+real (PR-026) e a surface (PR-026) não existirem, o relatório declara
+`claim: no-alpha` e o passo de input é explicitamente `skipped` — nada no harness
+alega suporte de plataforma, renderização real ou input.
+
 ### Alpha
 
 Além do MVP: múltiplas abas, tab lifecycle, popups com decisão, session save/restore, profiles/locking, history, bookmarks, downloads seguros, permissions com default deny, clearing de dados, diagnostics redigidos, WPT subset com expectations triadas, builds assinados de canal alpha e crash recovery exercitado. O Alpha só pode ser publicado após os artefatos e evidências de M0–M6 exigidos pelo gate machine-readable.

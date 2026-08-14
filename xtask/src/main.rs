@@ -91,18 +91,77 @@ fn run_check() -> Result<(), String> {
     validate_m0(&String::from_utf8_lossy(&metadata.stdout), &graph)
 }
 
+fn git_rev(arg: &str) -> Result<String, String> {
+    let output = Command::new("git")
+        .args(["rev-parse", arg])
+        .output()
+        .map_err(|error| format!("failed to run git rev-parse {arg}: {error}"))?;
+    if !output.status.success() {
+        return Err(format!("git rev-parse {arg} failed"));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+}
+
+fn run_smoke() -> Result<(), String> {
+    let repository = env::var("GITHUB_REPOSITORY").unwrap_or_else(|_| "local".to_string());
+    let head_sha = git_rev("HEAD")?;
+    let tree_sha = git_rev("HEAD^{tree}")?;
+    let engine_revision = format!("fake@{}", engine_api::SERVO_SPIKE_REVISION);
+    let os_and_arch = format!("{}-{}", env::consts::OS, env::consts::ARCH);
+
+    let mut evidence = test_support::smoke::run_mvp_smoke(
+        repository,
+        head_sha,
+        tree_sha,
+        engine_revision,
+        os_and_arch,
+    );
+    let missing = evidence.validate();
+    if !missing.is_empty() {
+        evidence.status = "NO_GO".to_string();
+        eprintln!("smoke: FAIL: evidence incomplete: {missing:?}");
+        return Err(format!("evidence incomplete: {missing:?}"));
+    }
+    fs::create_dir_all("docs/contracts").map_err(|e| e.to_string())?;
+    fs::write("docs/contracts/smoke-evidence.json", evidence.to_json())
+        .map_err(|error| format!("failed to write smoke evidence: {error}"))?;
+    if evidence.status == "NO_GO" {
+        eprintln!("smoke: NO_GO: an MVP step failed");
+        return Err("MVP smoke step failed".to_string());
+    }
+    println!(
+        "smoke: GO ({}/{} steps pass, engine={}, claim=no-alpha)",
+        evidence
+            .steps
+            .iter()
+            .filter(|step| matches!(step.result, test_support::smoke::StepResult::Pass))
+            .count(),
+        evidence.steps.len(),
+        evidence.engine_revision,
+    );
+    Ok(())
+}
+
 fn main() {
-    if let Some("architecture-check") = env::args().nth(1).as_deref() {
-        match run_check() {
+    match env::args().nth(1).as_deref() {
+        Some("architecture-check") => match run_check() {
             Ok(()) => println!("architecture-check: PASS (M0 packages match cargo metadata)"),
             Err(error) => {
                 eprintln!("architecture-check: FAIL: {error}");
                 std::process::exit(1);
             }
+        },
+        Some("smoke") => match run_smoke() {
+            Ok(()) => {}
+            Err(error) => {
+                eprintln!("smoke: FAIL: {error}");
+                std::process::exit(1);
+            }
+        },
+        _ => {
+            eprintln!("usage: cargo run -p xtask -- architecture-check | smoke");
+            std::process::exit(2);
         }
-    } else {
-        eprintln!("usage: cargo run -p xtask -- architecture-check");
-        std::process::exit(2);
     }
 }
 
