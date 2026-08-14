@@ -64,6 +64,16 @@ pub enum UiCommand {
     CloseTab { target_tab_id: TabId },
     /// User selected a different tab.
     SelectTab { target_tab_id: TabId },
+    /// User accepted a download; the policy decides the destination.
+    DownloadStart {
+        url: String,
+        suggested_name: String,
+        content_length: Option<u64>,
+    },
+    /// User cancelled an active download.
+    DownloadCancel { download_id: u64 },
+    /// User asked to retry a failed or cancelled download.
+    DownloadRetry { download_id: u64 },
 }
 
 // ---------------------------------------------------------------------------
@@ -104,6 +114,22 @@ pub enum UiEvent {
     NavigationFailed { reason: String },
     /// The page title changed.
     TitleChanged { title: String },
+    /// A download started and is streaming.
+    DownloadStarted {
+        download_id: u64,
+        suggested_name: String,
+    },
+    /// Download progress (bytes streamed so far).
+    DownloadProgress { download_id: u64, bytes: u64 },
+    /// A download reached a safe final path.
+    DownloadCompleted {
+        download_id: u64,
+        final_path: String,
+    },
+    /// A download failed with a typed reason.
+    DownloadFailed { download_id: u64, reason: String },
+    /// A download was cancelled.
+    DownloadCancelled { download_id: u64 },
     /// An unknown or malformed command was received.
     ///
     /// The core emits this instead of executing an invalid command so the UI
@@ -121,6 +147,12 @@ pub const MAX_URL_LEN: usize = 8192;
 /// Maximum allowed length for a title string in an event.
 pub const MAX_TITLE_LEN: usize = 1024;
 
+/// Maximum allowed length for a download suggested name.
+pub const MAX_SUGGESTED_NAME_LEN: usize = 255;
+
+/// Maximum length for a download failure reason string.
+pub const MAX_DOWNLOAD_REASON_LEN: usize = 1024;
+
 /// Validate a navigate command's URL length.
 ///
 /// Returns an error message if the URL exceeds the limit or is empty.
@@ -130,6 +162,32 @@ pub fn validate_navigate_url(url: &str) -> Result<(), String> {
     }
     if url.len() > MAX_URL_LEN {
         return Err(format!("URL exceeds maximum length of {MAX_URL_LEN} bytes"));
+    }
+    Ok(())
+}
+
+/// Validate a download start command's suggested name.
+///
+/// The name is metadata only — the destination is decided by the download
+/// policy in the core, never by this string.
+pub fn validate_suggested_name(name: &str) -> Result<(), String> {
+    if name.is_empty() {
+        return Err("suggested name must not be empty".to_string());
+    }
+    if name.len() > MAX_SUGGESTED_NAME_LEN {
+        return Err(format!(
+            "suggested name exceeds maximum length of {MAX_SUGGESTED_NAME_LEN} bytes"
+        ));
+    }
+    Ok(())
+}
+
+/// Validate a download failure reason event string.
+pub fn validate_download_reason(reason: &str) -> Result<(), String> {
+    if reason.len() > MAX_DOWNLOAD_REASON_LEN {
+        return Err(format!(
+            "download reason exceeds maximum length of {MAX_DOWNLOAD_REASON_LEN} bytes"
+        ));
     }
     Ok(())
 }
@@ -185,6 +243,19 @@ pub fn parse_command(raw: &str) -> CommandParseResult {
             return CommandParseResult::Rejected(reason);
         }
     }
+    if let UiCommand::DownloadStart {
+        url,
+        suggested_name,
+        ..
+    } = &envelope.command
+    {
+        if let Err(reason) = validate_navigate_url(url) {
+            return CommandParseResult::Rejected(reason);
+        }
+        if let Err(reason) = validate_suggested_name(suggested_name) {
+            return CommandParseResult::Rejected(reason);
+        }
+    }
     CommandParseResult::Ok(envelope)
 }
 
@@ -202,6 +273,11 @@ pub fn parse_event(raw: &str) -> EventParseResult {
     }
     if let UiEvent::TitleChanged { title } = &envelope.event {
         if let Err(reason) = validate_title(title) {
+            return EventParseResult::Rejected(reason);
+        }
+    }
+    if let UiEvent::DownloadFailed { reason, .. } = &envelope.event {
+        if let Err(reason) = validate_download_reason(reason) {
             return EventParseResult::Rejected(reason);
         }
     }
@@ -315,6 +391,116 @@ mod tests {
         match parse_event(&raw) {
             EventParseResult::Rejected(reason) => assert!(reason.contains("maximum")),
             EventParseResult::Ok(_) => panic!("oversized title should be rejected"),
+        }
+    }
+
+    #[test]
+    fn parse_valid_download_start_command() {
+        let raw = valid_envelope_json(
+            r#"{"type":"download_start","url":"https://example.test/f.bin","suggested_name":"f.bin","content_length":10}"#,
+        );
+        match parse_command(&raw) {
+            CommandParseResult::Ok(env) => {
+                assert!(matches!(env.command, UiCommand::DownloadStart { .. }));
+            }
+            CommandParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_download_start_with_empty_name_rejected() {
+        let raw = valid_envelope_json(
+            r#"{"type":"download_start","url":"https://example.test/f.bin","suggested_name":"","content_length":null}"#,
+        );
+        match parse_command(&raw) {
+            CommandParseResult::Rejected(reason) => assert!(reason.contains("empty")),
+            CommandParseResult::Ok(_) => panic!("empty suggested name should be rejected"),
+        }
+    }
+
+    #[test]
+    fn parse_download_cancel_command() {
+        let raw = valid_envelope_json(r#"{"type":"download_cancel","download_id":7}"#);
+        match parse_command(&raw) {
+            CommandParseResult::Ok(env) => {
+                assert!(matches!(
+                    env.command,
+                    UiCommand::DownloadCancel { download_id: 7 }
+                ));
+            }
+            CommandParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_download_retry_command() {
+        let raw = valid_envelope_json(r#"{"type":"download_retry","download_id":7}"#);
+        match parse_command(&raw) {
+            CommandParseResult::Ok(env) => {
+                assert!(matches!(
+                    env.command,
+                    UiCommand::DownloadRetry { download_id: 7 }
+                ));
+            }
+            CommandParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_download_progress_event() {
+        let raw = r#"{"version":1,"tab_id":null,"event":{"type":"download_progress","download_id":3,"bytes":42}}"#;
+        match parse_event(raw) {
+            EventParseResult::Ok(env) => {
+                assert!(matches!(
+                    env.event,
+                    UiEvent::DownloadProgress {
+                        download_id: 3,
+                        bytes: 42
+                    }
+                ));
+            }
+            EventParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_download_completed_event() {
+        let raw = r#"{"version":1,"tab_id":null,"event":{"type":"download_completed","download_id":3,"final_path":"/tmp/f.bin"}}"#;
+        match parse_event(raw) {
+            EventParseResult::Ok(env) => {
+                assert!(matches!(
+                    env.event,
+                    UiEvent::DownloadCompleted { download_id: 3, .. }
+                ));
+            }
+            EventParseResult::Rejected(reason) => panic!("rejected: {reason}"),
+        }
+    }
+
+    #[test]
+    fn parse_download_failed_event_with_oversized_reason_rejected() {
+        let reason = "x".repeat(MAX_DOWNLOAD_REASON_LEN + 1);
+        let raw = format!(
+            r#"{{"version":1,"tab_id":null,"event":{{"type":"download_failed","download_id":3,"reason":"{reason}"}}}}"#
+        );
+        match parse_event(&raw) {
+            EventParseResult::Rejected(reason) => assert!(reason.contains("maximum")),
+            EventParseResult::Ok(_) => panic!("oversized reason should be rejected"),
+        }
+    }
+
+    #[test]
+    fn parse_download_cancelled_event() {
+        let raw =
+            r#"{"version":1,"tab_id":null,"event":{"type":"download_cancelled","download_id":3}}"#;
+        match parse_event(raw) {
+            EventParseResult::Ok(env) => {
+                assert!(matches!(
+                    env.event,
+                    UiEvent::DownloadCancelled { download_id: 3 }
+                ));
+            }
+            EventParseResult::Rejected(reason) => panic!("rejected: {reason}"),
         }
     }
 

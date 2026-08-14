@@ -303,7 +303,13 @@ impl Default for IpcBridge {
 
 /// Returns `true` if a command is app-level (can be sent without a `tab_id`).
 fn is_app_level_command(command: &UiCommand) -> bool {
-    matches!(command, UiCommand::NewTab)
+    matches!(
+        command,
+        UiCommand::NewTab
+            | UiCommand::DownloadStart { .. }
+            | UiCommand::DownloadCancel { .. }
+            | UiCommand::DownloadRetry { .. }
+    )
 }
 
 fn target_tab_id(command: &UiCommand) -> Option<&browser_domain::ids::TabId> {
@@ -326,6 +332,9 @@ fn command_type_name(command: &UiCommand) -> &'static str {
         UiCommand::CloseTab { .. } => "close_tab",
         UiCommand::NewTab => "new_tab",
         UiCommand::SelectTab { .. } => "select_tab",
+        UiCommand::DownloadStart { .. } => "download_start",
+        UiCommand::DownloadCancel { .. } => "download_cancel",
+        UiCommand::DownloadRetry { .. } => "download_retry",
     }
 }
 
