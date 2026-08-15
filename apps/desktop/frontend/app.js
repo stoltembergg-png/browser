@@ -12,6 +12,7 @@
       "use strict";
 
       const UI_CONTRACT_VERSION = 1;
+      const MAX_HISTORY_ENTRIES = 50;
       let requestCounter = 0;
       let tabCounter = 0;
       let activeTabId = null;
@@ -42,14 +43,106 @@
         handleCommandResult(envelope);
       }
 
+      function updateHistoryCapabilities(tab) {
+        tab.canGoBack = tab.historyIndex > 0;
+        tab.canGoForward = tab.historyIndex >= 0 && tab.historyIndex < tab.history.length - 1;
+      }
+
+      function recordNavigation(tab, url) {
+        if (tab.history[tab.historyIndex] === url) return;
+        tab.history = tab.history.slice(0, tab.historyIndex + 1);
+        tab.history.push(url);
+        if (tab.history.length > MAX_HISTORY_ENTRIES) {
+          tab.history.shift();
+        }
+        tab.historyIndex = tab.history.length - 1;
+        updateHistoryCapabilities(tab);
+      }
+
+      function rejectCommand(tabId, reason) {
+        renderEvent({
+          version: UI_CONTRACT_VERSION,
+          tab_id: tabId || activeTabId,
+          event: { type: "command_rejected", reason: reason },
+        });
+      }
+
       function handleCommandResult(envelope) {
         // Simulate core processing and emitting an event back.
         const cmd = envelope.command;
+        const tab = tabs.get(envelope.tab_id || activeTabId);
         if (cmd.type === "navigate") {
+          if (!tab) {
+            rejectCommand(envelope.tab_id, "navigation target tab does not exist");
+            return;
+          }
+          recordNavigation(tab, cmd.url);
           renderEvent({
             version: UI_CONTRACT_VERSION,
             tab_id: envelope.tab_id || activeTabId,
             event: { type: "navigation_started", url: cmd.url },
+          });
+        } else if (cmd.type === "go_back") {
+          if (!tab || tab.historyIndex <= 0) {
+            rejectCommand(envelope.tab_id, "no previous page in history");
+            return;
+          }
+          tab.historyIndex -= 1;
+          updateHistoryCapabilities(tab);
+          const url = tab.history[tab.historyIndex];
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_started", url: url },
+          });
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_finished", url: url },
+          });
+        } else if (cmd.type === "go_forward") {
+          if (!tab || tab.historyIndex >= tab.history.length - 1) {
+            rejectCommand(envelope.tab_id, "no next page in history");
+            return;
+          }
+          tab.historyIndex += 1;
+          updateHistoryCapabilities(tab);
+          const url = tab.history[tab.historyIndex];
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_started", url: url },
+          });
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_finished", url: url },
+          });
+        } else if (cmd.type === "reload") {
+          if (!tab || !tab.url) {
+            rejectCommand(envelope.tab_id, "reload requires a committed page");
+            return;
+          }
+          const url = tab.url;
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_started", url: url },
+          });
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_finished", url: url },
+          });
+        } else if (cmd.type === "stop") {
+          if (!tab || !tab.loading) {
+            rejectCommand(envelope.tab_id, "stop requires an active navigation");
+            return;
+          }
+          renderEvent({
+            version: UI_CONTRACT_VERSION,
+            tab_id: envelope.tab_id || activeTabId,
+            event: { type: "navigation_cancelled" },
           });
         } else if (cmd.type === "new_tab") {
           const id = "tab-" + (++tabCounter);
@@ -91,6 +184,8 @@
               url: "",
               loading: false,
               error: null,
+              history: [],
+              historyIndex: -1,
               canGoBack: false,
               canGoForward: false,
             });
