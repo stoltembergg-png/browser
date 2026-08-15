@@ -19,6 +19,7 @@ class ReferencePlatformSmokeWorkflowTests(unittest.TestCase):
 
     def test_pr029_branch_runs_real_reference_contract(self) -> None:
         """PR-029 must select a real Servo evidence job, not the fake smoke."""
+        self.assertIn("name: CI / Quality Gate", self.workflow)
         self.assertIn(
             "startsWith(github.head_ref, 'feat/pr-029-reference-platform-smoke')",
             self.workflow,
