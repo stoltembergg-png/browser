@@ -263,10 +263,10 @@ fn write_evidence_artifact(evidence: &ServoEvidence) {
         .expect("SERVO_EVIDENCE_REPOSITORY for artifact");
     let commit_sha = std::env::var("SERVO_EVIDENCE_COMMIT_SHA")
         .expect("SERVO_EVIDENCE_COMMIT_SHA for artifact");
-    let tree_sha =
-        std::env::var("SERVO_EVIDENCE_TREE_SHA").expect("SERVO_EVIDENCE_TREE_SHA for artifact");
-    let os_and_arch =
-        std::env::var("SERVO_EVIDENCE_OS_ARCH").expect("SERVO_EVIDENCE_OS_ARCH for artifact");
+    let tree_sha = std::env::var("SERVO_EVIDENCE_TREE_SHA")
+        .expect("SERVO_EVIDENCE_TREE_SHA for artifact");
+    let os_and_arch = std::env::var("SERVO_EVIDENCE_OS_ARCH")
+        .expect("SERVO_EVIDENCE_OS_ARCH for artifact");
     let unsigned = json!({
         "status": "pass",
         "repository": repository,
