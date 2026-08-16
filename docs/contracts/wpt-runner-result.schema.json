@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PR-049 offline WPT result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "repository",
+    "commit_sha",
+    "tree_sha",
+    "engine_revision",
+    "os_and_arch",
+    "wpt_revision",
+    "manifest_sha256",
+    "counts",
+    "tests",
+    "result_digest"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "status": {"enum": ["pass", "NO_GO"]},
+    "repository": {"type": "string", "minLength": 1},
+    "commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "tree_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "engine_revision": {"type": "string", "minLength": 1},
+    "os_and_arch": {"type": "string", "minLength": 1},
+    "wpt_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pass",
+        "expected-fail",
+        "fail",
+        "unexpected-pass",
+        "timeout",
+        "notrun",
+        "error"
+      ],
+      "properties": {
+        "pass": {"type": "integer", "minimum": 0},
+        "expected-fail": {"type": "integer", "minimum": 0},
+        "fail": {"type": "integer", "minimum": 0},
+        "unexpected-pass": {"type": "integer", "minimum": 0},
+        "timeout": {"type": "integer", "minimum": 0},
+        "notrun": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0}
+      }
+    },
+    "tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "fixture_sha256",
+          "expected",
+          "actual",
+          "outcome"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "fixture_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "expected": {"enum": ["pass", "fail"]},
+          "actual": {"enum": ["pass", "fail", "timeout", "notrun", "error"]},
+          "outcome": {
+            "enum": [
+              "pass",
+              "expected-fail",
+              "fail",
+              "unexpected-pass",
+              "timeout",
+              "notrun",
+              "error"
+            ]
+          },
+          "error": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
