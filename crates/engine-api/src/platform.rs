@@ -404,14 +404,14 @@ fn normalize_engine_event(
 }
 
 fn validate_text(text: &str) -> Result<(), PlatformInputError> {
-    if text.is_empty() || text.as_bytes().len() > MAX_TEXT_BYTES || text.contains('\0') {
+    if text.is_empty() || text.len() > MAX_TEXT_BYTES || text.contains('\0') {
         return Err(PlatformInputError::InvalidText);
     }
     Ok(())
 }
 
 fn validate_key(key: &str) -> Result<(), PlatformInputError> {
-    if key.is_empty() || key.as_bytes().len() > MAX_KEY_BYTES || key.contains('\0') {
+    if key.is_empty() || key.len() > MAX_KEY_BYTES || key.contains('\0') {
         return Err(PlatformInputError::InvalidKey);
     }
     Ok(())
