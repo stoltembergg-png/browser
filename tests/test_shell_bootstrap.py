@@ -82,12 +82,41 @@ class ShellBootstrapTests(unittest.TestCase):
             f"frontendDist is remote: {dist}",
         )
 
-    def test_bundle_disabled(self) -> None:
-        """Bundling must be disabled in the bootstrap milestone."""
+    def test_bundle_activation_is_explicit(self) -> None:
+        """Bundle activation must be an explicit boolean configuration."""
         bundle = self.conf.get("bundle", {})
-        self.assertFalse(
-            bundle.get("active", True),
-            "bundle.active is not false",
+        self.assertIn("active", bundle, "bundle.active is not configured")
+        self.assertIsInstance(
+            bundle["active"],
+            bool,
+            "bundle.active must be a boolean",
+        )
+
+    def test_bundle_configuration(self) -> None:
+        """Bundle must be either disabled (bootstrap) or have valid
+        experimental targets (PR-053 Linux packaging).
+
+        When bundle.active is true, the config must declare:
+        - At least one target format (e.g. 'deb' for Linux)
+        - Linux deb dependencies (webkit2gtk, gtk3)
+        """
+        bundle = self.conf.get("bundle", {})
+        active = bundle.get("active", True)
+        if not active:
+            # Bootstrap milestone: bundling disabled — valid
+            return
+        # PR-053+: experimental bundling enabled
+        targets = bundle.get("targets", [])
+        self.assertGreater(
+            len(targets), 0,
+            "bundle.active is true but no targets declared",
+        )
+        linux_deb = (
+            bundle.get("linux", {}).get("deb", {}).get("depends", [])
+        )
+        self.assertGreater(
+            len(linux_deb), 0,
+            "bundle.linux.deb.depends must declare runtime dependencies",
         )
 
     def test_window_is_resizable(self) -> None:
