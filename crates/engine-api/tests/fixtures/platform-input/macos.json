@@ -1,0 +1,56 @@
+[
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 201,
+    "sequence": 1,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "focus_changed", "focused": true}
+  },
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 202,
+    "sequence": 2,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "pointer_down", "button": "left", "x": 10, "y": 20}
+  },
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 203,
+    "sequence": 3,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "key_down", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 204,
+    "sequence": 4,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "key_up", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 205,
+    "sequence": 5,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "text", "text": "typed"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "macos",
+    "event_id": 206,
+    "sequence": 6,
+    "scale_factor": {"numerator": 2, "denominator": 1},
+    "focus": "unfocused",
+    "event": {"type": "focus_changed", "focused": false}
+  }
+]

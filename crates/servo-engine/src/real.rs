@@ -29,6 +29,7 @@ use url::Url;
 
 pub const SERVO_SURFACE_STRATEGY: &str = "software-rendering-context";
 const MAX_TEXT_BYTES: usize = 4096;
+const MAX_KEY_BYTES: usize = 128;
 
 fn hex_digest(bytes: impl AsRef<[u8]>) -> String {
     bytes
@@ -236,6 +237,18 @@ impl ServoInstance {
         Ok(WebViewPoint::Device(DevicePoint::new(x as f32, y as f32)))
     }
 
+    fn send_key(webview: &WebView, key: String, state: KeyState) -> Result<(), EngineError> {
+        if key.is_empty() || key.len() > MAX_KEY_BYTES || key.contains('\0') {
+            return Err(EngineError::InvalidPayload {
+                reason: "key must be non-empty, bounded and NUL-free".into(),
+            });
+        }
+        webview.notify_input_event(ServoInputEvent::Keyboard(
+            KeyboardEvent::from_state_and_key(state, Key::Character(key)),
+        ));
+        Ok(())
+    }
+
     fn send_input(&self, input: InputEvent) -> Result<(), EngineError> {
         let webview = self.webview.as_ref().ok_or(EngineError::InvalidPayload {
             reason: "webview is closed".into(),
@@ -263,6 +276,8 @@ impl ServoInstance {
                     point,
                 )));
             }
+            InputEvent::KeyDown { key } => Self::send_key(webview, key, KeyState::Down)?,
+            InputEvent::KeyUp { key } => Self::send_key(webview, key, KeyState::Up)?,
             InputEvent::Text { text } => {
                 if text.is_empty() || text.len() > MAX_TEXT_BYTES || text.contains('\0') {
                     return Err(EngineError::InvalidPayload {

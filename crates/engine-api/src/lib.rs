@@ -21,6 +21,7 @@
 pub mod contract;
 pub mod envelopes;
 pub mod events;
+pub mod platform;
 pub mod surface;
 
 pub const PACKAGE_NAME: &str = "engine-api";

@@ -18,16 +18,17 @@
 
 ## Normalized input
 
-`engine-api::contract::InputEvent` is engine-neutral and uses integer device pixels:
+`engine-api::contract::InputEvent` is engine-neutral and uses integer device pixels after the platform boundary normalizes logical coordinates:
 
 - `pointer_move`, `pointer_down`, `pointer_up` with a bounded viewport point;
+- `key_down`/`key_up` with a non-empty, NUL-free 128-byte key;
 - `text` with a non-empty, NUL-free 4096-byte limit.
 
-The adapter translates these to Servo `MouseMoveEvent`, `MouseButtonEvent`, and bounded keyboard down/up pairs. Servo types do not cross into `engine-api` or `browser-core`.
+The platform contract in `engine-api::platform` preserves `event_id` and strict `sequence` ordering, requires focus for pointer/key/text input, and rejects unsupported or out-of-viewport events. The adapter translates the engine-neutral values to Servo `MouseMoveEvent`, `MouseButtonEvent`, and keyboard events. Servo types do not cross into `engine-api` or `browser-core`.
 
 ## Resize and scale
 
-Resize is applied to both `RenderingContext::resize` and `WebView::resize`. The initial adapter uses a scale factor of `1.0`; native window scale negotiation is intentionally deferred until a Tauri/window handle contract exists. The engine host owns last-value-wins coalescing.
+Resize is applied to both `RenderingContext::resize` and `WebView::resize`. Platform scale is represented as a bounded rational and converted with deterministic nearest-integer rounding. The checked PR-051 fixtures cover `1/1` Linux, `5/4` Windows and `2/1` macOS; native window scale negotiation remains a separate Tauri/window smoke. The engine host owns last-value-wins coalescing.
 
 ## Evidence and non-vacuity
 
@@ -44,4 +45,4 @@ When `PR026_ARTIFACT_PATH` is set, the test writes an identity-bound JSON artifa
 
 ## Out of scope
 
-Window/native-handle attachment, GPU presentation, tabs, downloads, permissions, DevTools, accessibility, process isolation, and claims of cross-platform runtime support remain outside PR-026. Those require their own platform evidence and contracts.
+Window/native-handle attachment, GPU presentation, tabs, downloads, permissions, DevTools, complete screen-reader support, process isolation, and claims of cross-platform runtime support remain outside PR-026. PR-051 adds the engine-neutral platform input/accessibility boundary and explicit unsupported screen-reader status; native runtime evidence still requires its own platform smoke.

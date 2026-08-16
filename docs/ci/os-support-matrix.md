@@ -48,9 +48,11 @@ Document which operating systems the browser shell, adapter, and surface smoke s
 
 2. **No artifact identity per OS:** The CI matrix validates compilation and tests, not binary artifacts. Binary artifact generation per OS is PR-052/053/054 (packaging).
 
-3. **Input/scale/window differences:** These are deferred to PR-051. The current matrix validates that types compile and tests pass, not that visual rendering or input works.
+3. **Input/scale/window differences:** PR-051 adds the engine-neutral input/scale/focus contract and per-OS fixtures. Native window rendering, Tauri event delivery and visual runtime behavior remain outside this contract and still require platform smoke.
 
-4. **Python tests Linux-only:** The Python check scripts (`documentation_check.py`, `security_check.py`, `quality_gate_check.py`) and acceptance tests run only on Linux. Cross-platform Python validation is not needed for M1; the scripts validate workspace metadata, not platform-specific behavior.
+4. **Native accessibility bridge not implemented:** PR-051 contracts focus events, keyboard navigation and text input, and explicitly reports the screen-reader bridge as unsupported. A native Tauri/window accessibility smoke remains required before claiming runtime accessibility support on an OS.
+
+5. **Python tests Linux-only:** The Python check scripts (`documentation_check.py`, `security_check.py`, `quality_gate_check.py`) and acceptance tests run only on Linux. Cross-platform Python validation is not needed for M1; the scripts validate workspace metadata, not platform-specific behavior.
 
 ## Reduction scope
 
