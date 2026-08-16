@@ -32,11 +32,11 @@
         "installMode": "perMachine"
       }
     },
-    "macOS": {
-      "dmg": {
-        "applications": [{ "name": "Applications", "path": "/Applications" }]
-      }
-    },
+    "macos": {
+          "dmg": {
+            "applications": [{ "name": "Applications", "path": "/Applications" }]
+          }
+        },
     "icon": [
       "icons/icon.png"
     ]
