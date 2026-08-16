@@ -92,6 +92,9 @@ jobs:
       - name: Run release manifest tests
         run: python3 -m unittest -v tests/test_release_manifest.py
 
+      - name: Run offline WPT harness contract tests
+        run: python3 tests/test_wpt_runner.py -v
+
   servo-real:
     name: PR-026 real Servo contract
     if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'feat/pr-026-servo-surface')

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "wpt_revision": "40f78009c81558c6ff89915cb2546c2fe3ef3b97",
+  "adapter_protocol": 1,
+  "tests": [
+    {
+      "id": "navigation/local-url",
+      "path": "navigation/local-url.html",
+      "fixture_sha256": "a84c952585d20d2f4b40c8001483b32a47340f5e84041a249719ca1f9633fbfa",
+      "expected": "pass"
+    },
+    {
+      "id": "csp/inline-script",
+      "path": "csp/inline-script.html",
+      "fixture_sha256": "5f62babacfd0140857a8c7b50a8eb33e56e5e0214defe06efbeb1c6ff63a1f10",
+      "expected": "fail",
+      "owner": "browser-team",
+      "reason": "The current engine does not execute this CSP fixture.",
+      "recheck_after": "2027-01-01"
+    }
+  ]
+}
