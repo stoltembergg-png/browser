@@ -83,6 +83,18 @@ def test_install_smoke_script_exists():
     )
 
 
+def test_install_smoke_usage_matches_parameter():
+    """The documented installer argument must match the PowerShell parameter."""
+    content = INSTALL_SCRIPT.read_text()
+    assert (
+        ".\\scripts\\windows_package_smoke.ps1 "
+        "[-InstallerPath path\\to\\setup.exe]"
+    ) in content, "Smoke script usage must document -InstallerPath"
+    assert "-DebPath" not in content, (
+        "Smoke script usage must not advertise the unrelated -DebPath parameter"
+    )
+
+
 def test_no_signing_secret_in_config():
     """No signing secret or certificate path should be in the config."""
     data = json.loads(TAURI_CONF.read_text())

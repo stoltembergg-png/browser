@@ -4,7 +4,7 @@
 # Must be run on the reference platform (Windows 10/11 x86_64).
 #
 # Usage:
-#   .\scripts\windows_package_smoke.ps1 [-DebPath path\to\Browser_0.1.0_x64-setup.exe]
+#   .\scripts\windows_package_smoke.ps1 [-InstallerPath path\to\setup.exe]
 #
 # If no installer path is given, the script validates the smoke contract
 # (checks that the tauri config and support matrix are consistent) without
