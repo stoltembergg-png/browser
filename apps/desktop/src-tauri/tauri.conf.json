@@ -21,7 +21,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb", "nsis"],
+    "targets": ["deb", "nsis", "dmg"],
     "linux": {
       "deb": {
         "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0", "libayatana-appindicator3-1"]
@@ -30,6 +30,11 @@
     "windows": {
       "nsis": {
         "installMode": "perMachine"
+      }
+    },
+    "macOS": {
+      "dmg": {
+        "applications": [{ "name": "Applications", "path": "/Applications" }]
       }
     },
     "icon": [
