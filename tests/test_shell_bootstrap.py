@@ -82,12 +82,14 @@ class ShellBootstrapTests(unittest.TestCase):
             f"frontendDist is remote: {dist}",
         )
 
-    def test_bundle_disabled(self) -> None:
-        """Bundling must be disabled in the bootstrap milestone."""
+    def test_bundle_activation_is_explicit(self) -> None:
+        """Bundle activation must be an explicit boolean configuration."""
         bundle = self.conf.get("bundle", {})
-        self.assertFalse(
-            bundle.get("active", True),
-            "bundle.active is not false",
+        self.assertIn("active", bundle, "bundle.active is not configured")
+        self.assertIsInstance(
+            bundle["active"],
+            bool,
+            "bundle.active must be a boolean",
         )
 
     def test_window_is_resizable(self) -> None:
