@@ -135,6 +135,12 @@ pub enum InputEvent {
         x: i32,
         y: i32,
     },
+    KeyDown {
+        key: String,
+    },
+    KeyUp {
+        key: String,
+    },
     Text {
         text: String,
     },

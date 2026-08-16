@@ -1,0 +1,56 @@
+[
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 1,
+    "sequence": 1,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "focus_changed", "focused": true}
+  },
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 2,
+    "sequence": 2,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "pointer_down", "button": "left", "x": 12, "y": 24}
+  },
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 3,
+    "sequence": 3,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "key_down", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 4,
+    "sequence": 4,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "key_up", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 5,
+    "sequence": 5,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "focused",
+    "event": {"type": "text", "text": "typed"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "linux",
+    "event_id": 6,
+    "sequence": 6,
+    "scale_factor": {"numerator": 1, "denominator": 1},
+    "focus": "unfocused",
+    "event": {"type": "focus_changed", "focused": false}
+  }
+]

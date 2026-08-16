@@ -37,6 +37,7 @@ present:
   - docs/contracts/wpt-runner-result.schema.json
   - docs/contracts/wpt-runner-contract.md
   - docs/contracts/render-input-contract.md
+  - docs/contracts/platform-input-contract.md
   - docs/ci/control-plane-runbook.md
   - docs/pr-dag.yaml
   - CURRENT_STATE.md

@@ -1,0 +1,56 @@
+[
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 101,
+    "sequence": 1,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "focused",
+    "event": {"type": "focus_changed", "focused": true}
+  },
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 102,
+    "sequence": 2,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "focused",
+    "event": {"type": "pointer_down", "button": "left", "x": 10, "y": 20}
+  },
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 103,
+    "sequence": 3,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "focused",
+    "event": {"type": "key_down", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 104,
+    "sequence": 4,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "focused",
+    "event": {"type": "key_up", "key": "a"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 105,
+    "sequence": 5,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "focused",
+    "event": {"type": "text", "text": "typed"}
+  },
+  {
+    "contract_version": 1,
+    "platform": "windows",
+    "event_id": 106,
+    "sequence": 6,
+    "scale_factor": {"numerator": 5, "denominator": 4},
+    "focus": "unfocused",
+    "event": {"type": "focus_changed", "focused": false}
+  }
+]
