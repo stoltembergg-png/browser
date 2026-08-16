@@ -33,10 +33,10 @@
       }
     },
     "macos": {
-          "dmg": {
-            "applications": [{ "name": "Applications", "path": "/Applications" }]
-          }
-        },
+      "dmg": {
+        "applications": [{ "name": "Applications", "path": "/Applications" }]
+      }
+    },
     "icon": [
       "icons/icon.png"
     ]
